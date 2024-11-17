@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page About - Convertisseur de Devises</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="fixed top-4 right-4 w-72 p-4 bg-white shadow-lg rounded">
+    <h2 class="text-xl font-bold mb-4 text-center">Convertisseur de Devises</h2>
+    <p id="currentCurrency" class="text-center mb-4">Affichage en : EUR</p>
+    <button id="toggleCurrencyButton" class="w-full bg-blue-500 text-white p-2 rounded">Convertir en USD</button>
+</div>
+
+<div class="w-full max-w-md p-8 bg-white shadow-lg rounded mt-16">
+    <h2 class="text-2xl font-bold mb-6 text-center">Transactions</h2>
+    <div id="transactionList" class="space-y-4">
+    </div>
+</div>
+
+<div class="fixed bottom-10 right-10">
+    <button onclick="window.location.href='add-transaction.html'" class="w-12 h-12 bg-blue-500 text-white text-3xl rounded-full flex items-center justify-center">
+        +
+    </button>
+</div>
+
+<script src="../dist/about.js"></script>
+</body>
+</html>
