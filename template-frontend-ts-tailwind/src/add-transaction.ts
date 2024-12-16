@@ -12,25 +12,46 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
-async function addTransaction(transaction: Transaction) {
+async function addTransaction(transaction: Transaction): Promise<void> {
   const db = await initDB();
   const transactionDB = db.transaction('transactions', 'readwrite');
   const store = transactionDB.objectStore('transactions');
   store.add(transaction);
 }
 
-function getLocation() {
-  if ("geolocation" in navigator) {
-    navigator.geolocation.getCurrentPosition(async (position) => {
-      const latitude = position.coords.latitude;
-      const longitude = position.coords.longitude;
+async function getTransactions(): Promise<Transaction[]> {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('transactions', 'readonly');
+    const store = transaction.objectStore('transactions');
+    const request = store.getAll();
 
-      const locationName = await getAddressFromCoordinates(latitude, longitude);
-      (document.getElementById('location') as HTMLInputElement).value = locationName;
-    }, (error) => {
-      alert("Impossible d'obtenir la position.");
-      console.error(error);
-    });
+    request.onsuccess = () => {
+      const transactions = (request.result as Transaction[]).map((t) => ({
+        ...t,
+        date: new Date(t.date),
+      }));
+      resolve(transactions);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+function getLocation(): void {
+  if ('geolocation' in navigator) {
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const latitude = position.coords.latitude;
+        const longitude = position.coords.longitude;
+
+        const locationName = await getAddressFromCoordinates(latitude, longitude);
+        (document.getElementById('location') as HTMLInputElement).value = locationName;
+      },
+      (error) => {
+        alert("Impossible d'obtenir la position.");
+        console.error(error);
+      }
+    );
   } else {
     alert("La géolocalisation n'est pas prise en charge par ce navigateur.");
   }
@@ -43,25 +64,50 @@ async function getAddressFromCoordinates(latitude: number, longitude: number): P
   try {
     const response = await fetch(url);
     const data = await response.json();
-    return data.results[0].formatted;
+    return data.results[0]?.formatted || 'Adresse inconnue';
   } catch (error) {
-    console.error("Erreur lors de la récupération de l'adresse", error);
-    return "Adresse inconnue";
+    console.error('Erreur lors de la récupération de l\'adresse', error);
+    return 'Adresse inconnue';
   }
 }
 
-document.getElementById('getLocation')?.addEventListener('click', getLocation);
+async function displayTransactions(): Promise<void> {
+  const transactionList = document.getElementById('transactionList');
+  if (!transactionList) return;
+
+  const transactions = await getTransactions();
+  if (transactions.length === 0) {
+    transactionList.innerHTML = "<p class='text-center text-gray-500'>Aucune transaction trouvée.</p>";
+    return;
+  }
+
+  transactionList.innerHTML = transactions
+    .map(
+      (transaction) => `
+        <div class="p-4 border border-gray-300 rounded">
+            <p><strong>Type :</strong> ${transaction.type}</p>
+            <p><strong>Catégorie :</strong> ${transaction.category}</p>
+            <p><strong>Montant :</strong> ${transaction.amount.toFixed(2)} EUR</p>
+            <p><strong>Lieu :</strong> ${transaction.location}</p>
+            <p><strong>Date :</strong> ${transaction.date.toLocaleDateString()}</p>
+        </div>
+    `
+    )
+    .join('');
+}
 
 document.getElementById('transactionForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
   const type = (document.getElementById('transactionType') as HTMLSelectElement).value;
-  const category = (document.getElementById('category') as HTMLInputElement).value;
-  const amount = (document.getElementById('amount') as HTMLInputElement).valueAsNumber;
+  const category = (document.getElementById('category') as HTMLSelectElement).value;
+  const amountInput = document.getElementById('amount') as HTMLInputElement;
+  const amount = amountInput.valueAsNumber;
   const location = (document.getElementById('location') as HTMLInputElement).value;
 
-  if (!type || !category || isNaN(amount) || !location) {
-    alert("Veuillez remplir tous les champs.");
+  if (!type || !category || !location || isNaN(amount) || amount <= 0) {
+    alert('Veuillez remplir tous les champs correctement, y compris un montant valide.');
+    amountInput.focus();
     return;
   }
 
@@ -70,10 +116,14 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
     category,
     amount,
     location,
-    date: new Date()
+    date: new Date(),
   };
 
   await addTransaction(transaction);
-  alert("Transaction ajoutée avec succès !");
-  window.location.href = "about.html";
+  alert('Transaction ajoutée avec succès !');
+  window.location.href = 'about.html';
 });
+
+// Initialisation des événements
+document.getElementById('getLocation')?.addEventListener('click', getLocation);
+document.addEventListener('DOMContentLoaded', displayTransactions);

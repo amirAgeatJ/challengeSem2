@@ -6,6 +6,7 @@
   <title>Ajouter une Transaction</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 <div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
   <h2 class="text-2xl font-bold mb-6 text-center">Ajouter une Transaction</h2>
@@ -19,7 +20,15 @@
     </div>
     <div class="mb-4">
       <label for="category" class="block text-gray-700">Catégorie</label>
-      <input type="text" id="category" class="w-full p-2 border border-gray-300 rounded" placeholder="Ex: Alimentaire, Transport">
+      <select id="category" class="w-full p-2 border border-gray-300 rounded">
+        <option value="loisir">Loisir</option>
+        <option value="alimentaire">Alimentaire</option>
+        <option value="transport">Transport</option>
+        <option value="logement">Logement</option>
+        <option value="santé">Santé</option>
+        <option value="éducation">Éducation</option>
+        <option value="autre">Autre</option>
+      </select>
     </div>
     <div class="mb-4">
       <label for="amount" class="block text-gray-700">Montant</label>
@@ -32,7 +41,6 @@
         <button type="button" id="getLocation" class="ml-2 bg-blue-500 text-white p-2 rounded">📍</button>
       </div>
     </div>
-
     <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Ajouter</button>
   </form>
 </div>

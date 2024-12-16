@@ -1,5 +1,3 @@
-
-// Initialise la base de données
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('TransactionDatabase', 1);
@@ -14,7 +12,15 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
+// Ajoute une transaction
+async function addTransaction(transaction: Transaction) {
+  const db = await initDB();
+  const transactionDB = db.transaction('transactions', 'readwrite');
+  const store = transactionDB.objectStore('transactions');
+  store.add(transaction);
+}
 
+// Récupère toutes les transactions
 async function getTransactions(): Promise<Transaction[]> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
@@ -27,19 +33,20 @@ async function getTransactions(): Promise<Transaction[]> {
   });
 }
 
+// Récupère le taux de conversion USD/EUR
 async function fetchUSDEURRate(): Promise<number> {
   const url = `https://api.exchangerate-api.com/v4/latest/EUR`;
   try {
-    debugger
     const response = await fetch(url);
     const data = await response.json();
     return data.rates.USD;
   } catch (error) {
-    console.error("Erreur lors de la récupération du taux de conversion", error);
+    console.error('Erreur lors de la récupération du taux de conversion', error);
     return 1;
   }
 }
 
+// Affiche les transactions avec conversion
 async function displayTransactions(conversionRate: number = 1, targetCurrency: string = 'EUR') {
   const transactionList = document.getElementById('transactionList');
   if (!transactionList) return;
@@ -50,7 +57,9 @@ async function displayTransactions(conversionRate: number = 1, targetCurrency: s
     return;
   }
 
-  transactionList.innerHTML = transactions.map(transaction => `
+  transactionList.innerHTML = transactions
+    .map(
+      (transaction) => `
         <div class="p-4 border border-gray-300 rounded">
             <p><strong>Type :</strong> ${transaction.type}</p>
             <p><strong>Catégorie :</strong> ${transaction.category}</p>
@@ -58,21 +67,30 @@ async function displayTransactions(conversionRate: number = 1, targetCurrency: s
             <p><strong>Lieu :</strong> ${transaction.location}</p>
             <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
         </div>
-    `).join('');
+    `
+    )
+    .join('');
 }
 
+// Basculer entre EUR et USD
 let isEuro = true;
 async function toggleCurrency() {
+  // Récupère le taux de conversion
   const rate = await fetchUSDEURRate();
-  const conversionRate = isEuro ? rate : 1 / rate;
+
+  // Applique le taux de conversion selon la devise actuelle
+  const conversionRate = isEuro ? rate : 1;
   const targetCurrency = isEuro ? 'USD' : 'EUR';
 
+  // Affiche les transactions dans la devise choisie
   displayTransactions(conversionRate, targetCurrency);
 
+  // Met à jour l'état et les textes du bouton et de la devise affichée
   isEuro = !isEuro;
   document.getElementById('currentCurrency')!.innerText = `Affichage en : ${targetCurrency}`;
   document.getElementById('toggleCurrencyButton')!.innerText = `Convertir en ${isEuro ? 'USD' : 'EUR'}`;
 }
 
+// Initialisation de l'affichage des transactions en EUR
 displayTransactions();
 document.getElementById('toggleCurrencyButton')?.addEventListener('click', toggleCurrency);
