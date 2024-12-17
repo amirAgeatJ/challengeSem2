@@ -12,12 +12,12 @@
   <div class="flex justify-between items-center mb-6">
     <h2 class="text-2xl font-bold">Budgets</h2>
     <a href="about.html" class="text-blue-500 hover:underline flex items-center">
-      Retour à la page About
-      <span class="ml-2">→</span>
+      Retour à la page About <span class="ml-2">→</span>
     </a>
   </div>
+
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-    <!-- Budget Cards with Inputs -->
+    <!-- Budget Inputs -->
     <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
       <span class="text-green-500 text-lg font-bold mb-2">Global</span>
       <input id="globalBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
@@ -38,28 +38,17 @@
       <span class="text-pink-500 text-lg font-bold mb-2">Logement</span>
       <input id="housingBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
     </div>
+    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
+      <span class="text-pink-500 text-lg font-bold mb-2">Education</span>
+      <input id="educationBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+    </div>
   </div>
+
   <div class="mt-6 flex justify-end">
     <button id="saveBudgets" class="bg-blue-500 text-white p-2 rounded">Enregistrer les Budgets</button>
   </div>
 </div>
 
-<script>
-  // Example: Save budgets to local storage or show an alert with the values
-  document.getElementById('saveBudgets').addEventListener('click', () => {
-    const budgets = {
-      global: document.getElementById('globalBudget').value,
-      transport: document.getElementById('transportBudget').value,
-      leisure: document.getElementById('leisureBudget').value,
-      health: document.getElementById('healthBudget').value,
-      housing: document.getElementById('housingBudget').value,
-    };
-
-    alert(`Budgets sauvegardés : \n${JSON.stringify(budgets, null, 2)}`);
-    // You can save 'budgets' to local storage or send it to a server here
-    localStorage.setItem('budgets', JSON.stringify(budgets));
-  });
-</script>
-
+<script src="../dist/budget.js"></script>
 </body>
 </html>
