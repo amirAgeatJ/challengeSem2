@@ -1,13 +1,13 @@
 // Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 3); // Version incrémentée
+    const request = indexedDB.open('UserDatabase', 3);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
       if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'email' }); // Clé primaire : email
+        db.createObjectStore('users', { keyPath: 'email' });
       }
     };
 
@@ -22,7 +22,7 @@ interface User {
   username: string;
   email: string;
   password: string;
-  profileImage?: string; // Ajout d'une photo de profil
+  profileImage?: string; // Photo de profil (base64)
 }
 
 // Ajoute un utilisateur dans IndexedDB
@@ -64,19 +64,22 @@ function startCamera() {
   });
 }
 
-// Gestion du drag and drop
+// Setup Drag and Drop avec HTML Drag and Drop API
 function setupDragAndDrop() {
-  const dropZone = document.getElementById('dropZone');
-  dropZone?.addEventListener('dragover', (e) => {
+  const dropZone = document.getElementById('dropZone') as HTMLDivElement;
+  const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
+  const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
+
+  dropZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     dropZone.classList.add('bg-gray-200');
   });
 
-  dropZone?.addEventListener('dragleave', () => {
+  dropZone.addEventListener('dragleave', () => {
     dropZone.classList.remove('bg-gray-200');
   });
 
-  dropZone?.addEventListener('drop', (e) => {
+  dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('bg-gray-200');
 
@@ -84,14 +87,12 @@ function setupDragAndDrop() {
     if (file && file.type.startsWith('image/')) {
       const reader = new FileReader();
       reader.onload = () => {
-        const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
-        const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
         profileImageInput.value = reader.result as string;
         profileImageDisplay.src = reader.result as string;
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Veuillez déposer un fichier image.");
+      alert("Veuillez déposer un fichier image valide.");
     }
   });
 }

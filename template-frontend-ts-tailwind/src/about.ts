@@ -18,7 +18,20 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
-// Récupère le budget de l'utilisateur connecté
+function showNotification(title: string, body: string) {
+  if (!("Notification" in window)) {
+    alert("Les notifications ne sont pas prises en charge par votre navigateur.");
+    return;
+  }
+
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      const notification = new Notification(title, { body });
+      setTimeout(() => notification.close(), 5000);
+    }
+  });
+}
+
 async function getUserBudget(): Promise<any> {
   const userId = localStorage.getItem('idUser');
   if (!userId) return null;
@@ -34,7 +47,26 @@ async function getUserBudget(): Promise<any> {
   });
 }
 
-// Affiche le graphique des budgets
+async function displayUserBudget() {
+  const budget = await getUserBudget();
+  const budgetSummary = document.getElementById('budgetSummary');
+
+  if (!budget || !budgetSummary) return;
+
+  budgetSummary.innerHTML = `
+    <p><strong>Global :</strong> ${budget.global || 0} €</p>
+    <p><strong>Transport :</strong> ${budget.transport || 0} €</p>
+    <p><strong>Loisir :</strong> ${budget.leisure || 0} €</p>
+    <p><strong>Santé :</strong> ${budget.health || 0} €</p>
+    <p><strong>Logement :</strong> ${budget.housing || 0} €</p>
+    <p><strong>Éducation :</strong> ${budget.education || 0} €</p>
+  `;
+
+  if ((budget.global || 0) <= 0) {
+    showNotification("Budget nul", "Votre budget global est nul ou inférieur à zéro.");
+  }
+}
+
 async function displayBudgetChart() {
   const budget = await getUserBudget();
   if (!budget) return;
@@ -49,30 +81,19 @@ async function displayBudgetChart() {
   new Chart(ctx, {
     type: 'doughnut',
     data: {
-      labels: labels,
-      datasets: [{
-        data: data,
-        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-        hoverOffset: 4
-      }]
+      labels,
+      datasets: [{ data, backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'] }]
     },
     options: {
       responsive: true,
       plugins: {
         legend: { position: 'top' },
-        tooltip: {
-          callbacks: {
-            label: function(context) {
-              return `${context.label}: ${context.raw} €`;
-            }
-          }
-        }
+        tooltip: { callbacks: { label: (context) => `${context.label}: ${context.raw} €` } }
       }
     }
   });
 }
 
-// Récupère les transactions pour l'utilisateur
 async function getUserTransactions(): Promise<any[]> {
   const userId = localStorage.getItem('idUser');
   if (!userId) return [];
@@ -88,51 +109,38 @@ async function getUserTransactions(): Promise<any[]> {
   });
 }
 
-// Affiche les transactions dans la page
 async function displayTransactions() {
   const transactions = await getUserTransactions();
   const transactionList = document.getElementById('transactionList');
 
   if (!transactionList) return;
 
-  if (transactions.length === 0) {
-    transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
-    return;
+  transactionList.innerHTML = transactions.length === 0
+    ? `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`
+    : transactions.map(transaction => `
+        <div class="p-4 border border-gray-300 rounded">
+          <p><strong>Type :</strong> ${transaction.type}</p>
+          <p><strong>Catégorie :</strong> ${transaction.category}</p>
+          <p><strong>Montant :</strong> ${transaction.amount.toFixed(2)} €</p>
+          <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
+        </div>
+      `).join('');
+}
+
+// Activation du mode plein écran
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    document.exitFullscreen();
   }
-
-  transactionList.innerHTML = transactions
-    .map((transaction) => `
-      <div class="p-4 border border-gray-300 rounded">
-        <p><strong>Type :</strong> ${transaction.type}</p>
-        <p><strong>Catégorie :</strong> ${transaction.category}</p>
-        <p><strong>Montant :</strong> ${transaction.amount.toFixed(2)} €</p>
-        <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
-      </div>
-    `)
-    .join('');
 }
 
-// Affiche le résumé des budgets
-async function displayUserBudget() {
-  const budget = await getUserBudget();
-  const budgetSummary = document.getElementById('budgetSummary');
-
-  if (!budget || !budgetSummary) return;
-
-  const summaryHTML = `
-    <p><strong>Global :</strong> ${budget.global || 0} €</p>
-    <p><strong>Transport :</strong> ${budget.transport || 0} €</p>
-    <p><strong>Loisir :</strong> ${budget.leisure || 0} €</p>
-    <p><strong>Santé :</strong> ${budget.health || 0} €</p>
-    <p><strong>Logement :</strong> ${budget.housing || 0} €</p>
-    <p><strong>Éducation :</strong> ${budget.education || 0} €</p>
-  `;
-  budgetSummary.innerHTML = summaryHTML;
-}
-
-// Initialisation
 document.addEventListener('DOMContentLoaded', async () => {
   await displayUserBudget();
   await displayBudgetChart();
   await displayTransactions();
+
+  const fullScreenButton = document.getElementById('fullscreenButton');
+  fullScreenButton?.addEventListener('click', toggleFullScreen);
 });
