@@ -22,6 +22,19 @@
       <label for="password" class="block text-gray-700">Mot de passe</label>
       <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
     </div>
+
+    <div class="mb-4">
+      <label class="block text-gray-700">Photo de profil</label>
+      <video id="camera" class="w-full mb-2 rounded" autoplay></video>
+      <canvas id="canvas" class="hidden"></canvas>
+      <input type="hidden" id="profileImage">
+      <button type="button" id="captureButton" class="bg-blue-500 text-white p-2 rounded mb-2">Prendre une photo</button>
+      <div id="dropZone" class="border-2 border-dashed p-4 text-center text-gray-500 rounded">
+        Glissez et déposez une image ici
+      </div>
+      <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto mt-2" src="" alt="Aperçu de la photo">
+    </div>
+
     <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
   </form>
 </div>

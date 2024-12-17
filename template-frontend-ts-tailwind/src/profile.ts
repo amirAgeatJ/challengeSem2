@@ -1,12 +1,13 @@
-// Fonction pour initialiser IndexedDB
+// Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserProfileDB', 1);
+    const request = indexedDB.open('UserDatabase', 3);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
+
       if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'id' }); // Stockage des utilisateurs par ID
+        db.createObjectStore('users', { keyPath: 'id' });
       }
     };
 
@@ -15,8 +16,8 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
-// Fonction pour récupérer les informations du profil utilisateur
-async function getUserProfile(userId: string): Promise<any> {
+// Fonction pour récupérer un utilisateur par ID
+async function getUserById(userId: string): Promise<any> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readonly');
@@ -28,16 +29,16 @@ async function getUserProfile(userId: string): Promise<any> {
   });
 }
 
-// Fonction pour sauvegarder les informations mises à jour du profil
-async function saveUserProfile(profile: any): Promise<void> {
+// Fonction pour sauvegarder les modifications d'un utilisateur
+async function updateUser(user: any): Promise<void> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readwrite');
     const store = transaction.objectStore('users');
-    const request = store.put(profile);
+    const request = store.put(user);
 
     request.onsuccess = () => resolve();
-    request.onerror = () => reject('Erreur lors de la sauvegarde du profil.');
+    request.onerror = () => reject('Erreur lors de la mise à jour du profil.');
   });
 }
 
@@ -53,21 +54,20 @@ function startCamera() {
              video.play();
            })
            .catch((error) => {
-             console.error('Erreur lors de l\'accès à la caméra :', error);
-             alert('Impossible d\'accéder à la caméra.');
+             console.error("Erreur d'accès à la caméra :", error);
+             alert("Impossible d'accéder à la caméra.");
            });
 
   document.getElementById('captureButton')?.addEventListener('click', () => {
     if (context) {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png'); // Convertir en base64
-      const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
-      profileImageInput.value = imageData;
+      const imageData = canvas.toDataURL('image/png'); // Capture de la photo en base64
+      (document.getElementById('profileImage') as HTMLInputElement).value = imageData;
     }
   });
 }
 
-// Gestionnaire d'événements pour sauvegarder le profil
+// Gestionnaire d'événements pour soumettre le formulaire
 document.getElementById('profileForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -80,10 +80,10 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
   const username = (document.getElementById('username') as HTMLInputElement).value;
   const profileImage = (document.getElementById('profileImage') as HTMLInputElement).value;
 
-  const updatedProfile = { id: userId, username, profileImage };
+  const updatedUser = { id: userId, username, profileImage };
 
   try {
-    await saveUserProfile(updatedProfile);
+    await updateUser(updatedUser);
     alert('Profil mis à jour avec succès !');
   } catch (error) {
     console.error(error);
@@ -99,18 +99,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     return;
   }
 
-  const userProfile = await getUserProfile(userId);
+  const user = await getUserById(userId);
 
-  // Remplir le formulaire avec les données existantes
-  (document.getElementById('username') as HTMLInputElement).value = userProfile.username || '';
+  // Pré-remplit le formulaire avec les données existantes
+  (document.getElementById('username') as HTMLInputElement).value = user.username || '';
   const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
-  profileImageInput.value = userProfile.profileImage || '';
+  profileImageInput.value = user.profileImage || '';
 
-  if (userProfile.profileImage) {
+  if (user.profileImage) {
     const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
-    profileImageDisplay.src = userProfile.profileImage;
+    profileImageDisplay.src = user.profileImage;
   }
 
-  // Lancement de la caméra
+  // Démarre la caméra pour la capture de photo
   startCamera();
 });

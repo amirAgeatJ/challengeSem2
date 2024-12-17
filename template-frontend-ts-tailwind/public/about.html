@@ -5,32 +5,51 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page About - Convertisseur de Devises</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- Inclut Chart.js depuis le CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4">
 
-<div id="budgetDisplay" class="w-full max-w-md p-4 bg-white shadow-lg rounded mt-6">
-    <!-- Les budgets seront affichés ici -->
-</div>
-
-<div class="fixed top-4 left-4">
-    <button onclick="window.location.href='budget.html'" class="bg-green-500 text-white p-2 rounded">Page Budget</button>
-</div>
-
-<div class="fixed top-4 right-4 w-72 p-4 bg-white shadow-lg rounded">
-    <h2 class="text-xl font-bold mb-4 text-center">Convertisseur de Devises</h2>
-    <p id="currentCurrency" class="text-center mb-4">Affichage en : EUR</p>
-    <button id="toggleCurrencyButton" class="w-full bg-blue-500 text-white p-2 rounded">Convertir en USD</button>
-</div>
-
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded mt-16">
-    <h2 class="text-2xl font-bold mb-6 text-center">Transactions</h2>
-    <div id="transactionList" class="space-y-4">
+<!-- Section Budget -->
+<div id="budgetDisplay" class="w-full max-w-md p-4 bg-white shadow-lg rounded mt-4">
+    <h2 class="text-xl font-bold mb-4 text-center">Budgets</h2>
+    <div id="budgetSummary" class="text-gray-700">
+        <!-- Résumé des budgets sera affiché ici -->
     </div>
 </div>
 
-<div class="fixed bottom-10 right-10">
-    <button onclick="window.location.href='add-transaction.html'" class="w-12 h-12 bg-blue-500 text-white text-3xl rounded-full flex items-center justify-center">
-        +
+<!-- Graphique Budget -->
+<div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
+    <h2 class="text-xl font-bold mb-4 text-center">Répartition des Budgets</h2>
+    <canvas id="budgetChart"></canvas>
+</div>
+
+<!-- Section Transactions -->
+<div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
+    <h2 class="text-xl font-bold mb-4 text-center">Transactions</h2>
+    <div id="transactionList" class="space-y-4">
+        <!-- Transactions seront affichées ici -->
+    </div>
+</div>
+
+<!-- Boutons Navigation -->
+<div class="fixed top-4 left-4 flex gap-4">
+    <!-- Bouton Page Budget -->
+    <button onclick="window.location.href='budget.html'"
+            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        Page Budget
+    </button>
+
+    <!-- Bouton Profil -->
+    <button onclick="window.location.href='profile.html'"
+            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Profil
+    </button>
+
+    <!-- Bouton Ajouter Transaction -->
+    <button onclick="window.location.href='add-transaction.html'"
+            class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+        Ajouter Transaction
     </button>
 </div>
 

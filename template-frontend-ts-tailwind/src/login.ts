@@ -1,6 +1,6 @@
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 2); // Version 2
+    const request = indexedDB.open('UserDatabase', 3); // Version 2
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
