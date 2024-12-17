@@ -1,9 +1,33 @@
+<head>
+  <link rel="stylesheet" href="styles.css"> 
+  <link 
+  href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" 
+  rel="stylesheet"
+>
+</head>
+
+<!-- Sidebar -->
 <div class="sidebar">
-  <h2 class="sidebar-title">Menu</h2>
+  <div class="sidebar-header">
+    <a href="index.html" class="logo" target="_parent">
+      <img src="assets/img/logo.png" alt="FundFlow Logo" class="img-fluid">
+    </a>
+    <h2 class="sidebar-title">FundFlow</h2>
+  </div>
+
   <ul class="sidebar-menu">
-    <li><a href="home.html">Home</a></li>
-    <li><a href="budget.html">Budget</a></li>
-    <li><a href="transaction.html">Transaction</a></li>
-    <li><a href="report.html">Report</a></li>
+    <li><a href="index.html" target="_parent"><i class="bi bi-speedometer2" style=" font-size: 1.2rem;">&nbsp;&nbsp;</i>Home</a></li>
+    <li><a href="budget.html" target="_parent"><i class="bi bi-pie-chart" style=" font-size: 1.2rem;">&nbsp;&nbsp;</i> Budget</a></li>
+    <li><a href="add-transaction.html" target="_parent"><i class="bi bi-arrow-left-right" style=" font-size: 1.2rem;">&nbsp;&nbsp;</i> Transactions</a></li>
+    <li><a href="report.html" target="_parent"><i class="bi bi-file-ruled" style=" font-size: 1.2rem;">&nbsp;&nbsp;</i> Reports</a></li>
   </ul>
 </div>
+
+<!--
+  - pour intégrer le side bar il faut ajouter tout d'abord cette partie avant le body :
+  <div class="sidebar-container">
+    <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
+  </div>
+  - ensuite ajouter cette partie dans le class de body : 
+     main-content
+-->

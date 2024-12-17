@@ -8,8 +8,15 @@
     <!-- Inclut Chart.js depuis le CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 flex flex-col items-center min-h-screen p-4">
-
+<!--Display the side bar-->
+<div class="sidebar-container">
+    <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
+</div>
+<!--Display the top bar-->
+<div class="topbar-container">
+    <iframe src="topbar.html" class="topbar-iframe" frameborder="0"></iframe>
+</div>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen main-content">
 <!-- Section Budget -->
 <div id="budgetDisplay" class="w-full max-w-md p-4 bg-white shadow-lg rounded mt-4">
     <h2 class="text-xl font-bold mb-4 text-center">Budgets</h2>
@@ -40,26 +47,7 @@
 </div>
 
 
-<!-- Boutons Navigation -->
-<div class="fixed top-4 left-4 flex gap-4">
-    <!-- Bouton Page Budget -->
-    <button onclick="window.location.href='budget.html'"
-            class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-        Page Budget
-    </button>
 
-    <!-- Bouton Profil -->
-    <button onclick="window.location.href='profile.html'"
-            class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Profil
-    </button>
-
-    <!-- Bouton Ajouter Transaction -->
-    <button onclick="window.location.href='add-transaction.html'"
-            class="bg-purple-500 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
-        Ajouter Transaction
-    </button>
-</div>
 
 <script src="../dist/about.js"></script>
 </body>
