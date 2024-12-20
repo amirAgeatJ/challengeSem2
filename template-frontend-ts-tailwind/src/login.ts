@@ -1,32 +1,36 @@
+// Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 3); // Version 2
+    const request = indexedDB.open('UserDatabase', 6);
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 }
 
+// Vérifie les identifiants utilisateur
 async function verifyUser(email: string, password: string): Promise<User | null> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readonly');
     const store = transaction.objectStore('users');
-    const request = store.get(email);
+    const index = store.index('email'); // Utilisez l'index "email"
+    const request = index.get(email);
 
     request.onsuccess = () => {
       const user = request.result as User;
       if (user && user.password === password) {
-        resolve(user); // Retourne l'objet utilisateur complet si valide
+        resolve(user); // Identifiants valides
       } else {
-        resolve(null); // Mot de passe incorrect ou utilisateur non trouvé
+        resolve(null); // Identifiants invalides
       }
     };
-    request.onerror = () => reject(null);
+
+    request.onerror = () => reject('Erreur lors de la vérification des identifiants.');
   });
 }
 
-// Écouteur du formulaire de connexion
+// Gestionnaire de connexion
 document.getElementById('loginForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -34,26 +38,16 @@ document.getElementById('loginForm')?.addEventListener('submit', async (event) =
   const password = (document.getElementById('password') as HTMLInputElement).value;
 
   try {
-    const user = await verifyUser(email, password); // Vérifie les identifiants
+    const user = await verifyUser(email, password);
     if (user) {
-      // Stocke l'ID utilisateur dans le Local Storage
       localStorage.setItem('idUser', user.id);
-
       alert("Connexion réussie !");
-      window.location.href = "about.html"; // Redirige vers la page About
+      window.location.href = 'about.html';
     } else {
       alert("Email ou mot de passe incorrect.");
     }
   } catch (error) {
     console.error("Erreur lors de la connexion :", error);
-    alert("Une erreur est survenue. Veuillez réessayer.");
+    alert("Une erreur est survenue.");
   }
 });
-
-// Interface utilisateur pour le typage
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  password: string;
-}

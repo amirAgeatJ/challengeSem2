@@ -6,20 +6,13 @@
   <title>Profil Utilisateur</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<!--Display the side bar-->
-<div class="sidebar-container">
-  <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
-</div>
-<!--Display the top bar-->
-<div class="topbar-container">
-  <iframe src="topbar.html" class="topbar-iframe" frameborder="0"></iframe>
-</div>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen main-content">
-  <div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
   <h2 class="text-2xl font-bold mb-6 text-center">Mettre à Jour le Profil</h2>
   <form id="profileForm">
     <div class="mb-4">
       <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
+      <!-- Le champ username sera pré-rempli avec le script -->
       <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre nom d'utilisateur">
     </div>
 
@@ -35,7 +28,6 @@
     <button type="submit" class="w-full bg-green-500 text-white p-2 rounded">Enregistrer</button>
   </form>
 </div>
-
 <script src="../dist/profile.js"></script>
 </body>
 </html>

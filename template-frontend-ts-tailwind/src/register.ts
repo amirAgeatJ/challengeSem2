@@ -1,14 +1,21 @@
-// Initialise la base de données IndexedDB
+// Initialise la base de données IndexedDB avec "id" comme clé primaire
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 3);
+    const request = indexedDB.open('UserDatabase', 6); // Incrémenter la version
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'email' });
+      // Supprimez l'ancienne store si elle existe déjà
+      if (db.objectStoreNames.contains('users')) {
+        db.deleteObjectStore('users');
       }
+
+      // Créez un nouveau store avec "id" comme clé primaire
+      const store = db.createObjectStore('users', { keyPath: 'id' });
+
+      // Ajoutez un index pour rechercher par "email"
+      store.createIndex('email', 'email', { unique: true });
     };
 
     request.onsuccess = () => resolve(request.result);
@@ -31,10 +38,12 @@ async function addUser(user: User): Promise<void> {
   const transaction = db.transaction('users', 'readwrite');
   const store = transaction.objectStore('users');
 
-  store.add(user);
+  const request = store.add(user);
 
-  transaction.oncomplete = () => console.log("Utilisateur ajouté avec succès !");
-  transaction.onerror = () => console.error("Erreur lors de l'ajout de l'utilisateur");
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject('Erreur lors de l\'ajout de l\'utilisateur');
+  });
 }
 
 // Capture une photo avec la caméra
@@ -49,22 +58,21 @@ function startCamera() {
              video.play();
            })
            .catch((error) => {
-             console.error("Erreur lors de l'accès à la caméra :", error);
+             console.error("Erreur d'accès à la caméra :", error);
              alert("Impossible d'accéder à la caméra.");
            });
 
   document.getElementById('captureButton')?.addEventListener('click', () => {
     context?.drawImage(video, 0, 0, canvas.width, canvas.height);
-    const imageData = canvas.toDataURL('image/png'); // Convertit en base64
+    const imageData = canvas.toDataURL('image/png');
     (document.getElementById('profileImage') as HTMLInputElement).value = imageData;
 
-    // Afficher l'image capturée
     const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
     profileImageDisplay.src = imageData;
   });
 }
 
-// Setup Drag and Drop avec HTML Drag and Drop API
+// Setup Drag and Drop
 function setupDragAndDrop() {
   const dropZone = document.getElementById('dropZone') as HTMLDivElement;
   const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
@@ -92,12 +100,12 @@ function setupDragAndDrop() {
       };
       reader.readAsDataURL(file);
     } else {
-      alert("Veuillez déposer un fichier image valide.");
+      alert("Veuillez déposer une image valide.");
     }
   });
 }
 
-// Gestionnaire d'événements pour l'inscription
+// Gestionnaire d'inscription
 document.getElementById('registerForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -112,10 +120,10 @@ document.getElementById('registerForm')?.addEventListener('submit', async (event
 
   try {
     await addUser(user);
-    alert("Utilisateur inscrit avec succès !");
+    alert("Inscription réussie !");
     window.location.href = 'login.html';
   } catch (error) {
-    alert("Erreur lors de l'inscription. Cet email existe peut-être déjà.");
+    alert("Erreur lors de l'inscription. L'email existe peut-être déjà.");
   }
 });
 

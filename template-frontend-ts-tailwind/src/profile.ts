@@ -1,14 +1,18 @@
 // Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 3);
+    const request = indexedDB.open('UserDatabase', 6); // Incrémentez la version (4 ici)
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'id' });
+      // Supprimez l'ancien Object Store s'il existe
+      if (db.objectStoreNames.contains('users')) {
+        db.deleteObjectStore('users');
       }
+
+      // Créez un nouveau Object Store avec `id` comme clé primaire
+      db.createObjectStore('users', { keyPath: 'id' });
     };
 
     request.onsuccess = () => resolve(request.result);
@@ -16,25 +20,40 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
+// Interface utilisateur
+interface User {
+  id: string;
+  username: string;
+  profileImage: string; // Obligatoire pour garantir la conformité
+}
+
 // Fonction pour récupérer un utilisateur par ID
-async function getUserById(userId: string): Promise<any> {
+async function getUserById(userId: string): Promise<User | null> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readonly');
     const store = transaction.objectStore('users');
-    const request = store.get(userId);
+    const request = store.get(userId); // Récupère par id (clé primaire)
 
-    request.onsuccess = () => resolve(request.result || { id: userId, username: '', profileImage: '' });
+    request.onsuccess = () => {
+      const user = request.result;
+      if (user) {
+        resolve(user as User);
+      } else {
+        resolve(null);
+      }
+    };
     request.onerror = () => reject('Erreur lors de la récupération du profil.');
   });
 }
 
 // Fonction pour sauvegarder les modifications d'un utilisateur
-async function updateUser(user: any): Promise<void> {
+async function updateUser ( user : { id : string; profileImage : string; username : string } ): Promise<void> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readwrite');
     const store = transaction.objectStore('users');
+
     const request = store.put(user);
 
     request.onsuccess = () => resolve();
@@ -63,6 +82,8 @@ function startCamera() {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
       const imageData = canvas.toDataURL('image/png'); // Capture de la photo en base64
       (document.getElementById('profileImage') as HTMLInputElement).value = imageData;
+      const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
+      profileImageDisplay.src = imageData;
     }
   });
 }
@@ -80,7 +101,11 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
   const username = (document.getElementById('username') as HTMLInputElement).value;
   const profileImage = (document.getElementById('profileImage') as HTMLInputElement).value;
 
-  const updatedUser = { id: userId, username, profileImage };
+  const updatedUser: { id : string; profileImage : string; username : string } = {
+    id: userId,
+    username,
+    profileImage
+  };
 
   try {
     await updateUser(updatedUser);
@@ -98,17 +123,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert('Utilisateur non connecté.');
     return;
   }
-
+  debugger
   const user = await getUserById(userId);
 
-  // Pré-remplit le formulaire avec les données existantes
-  (document.getElementById('username') as HTMLInputElement).value = user.username || '';
-  const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
-  profileImageInput.value = user.profileImage || '';
+  if (user) {
+    (document.getElementById('username') as HTMLInputElement).value = user.username;
+    const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
+    profileImageInput.value = user.profileImage;
 
-  if (user.profileImage) {
     const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
     profileImageDisplay.src = user.profileImage;
+  } else {
+    alert('Utilisateur non trouvé.');
   }
 
   // Démarre la caméra pour la capture de photo
