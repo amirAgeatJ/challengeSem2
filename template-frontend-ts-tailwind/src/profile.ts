@@ -25,6 +25,40 @@ interface User {
 }
 
 // Fonction pour récupérer un utilisateur par ID
+
+
+async function setupIdleDetection() {
+  if (!('IdleDetector' in window)) {
+    console.warn('Idle Detection API non prise en charge dans ce navigateur.');
+    return;
+  }
+
+  try {
+    const permission = await IdleDetector.requestPermission();
+    if (permission !== 'granted') {
+      console.warn("Permission pour l'API Idle Detection refusée.");
+      return;
+    }
+
+    const idleDetector = new IdleDetector();
+    idleDetector.addEventListener('change', () => {
+      const userState = idleDetector.userState; // 'active' ou 'idle'
+      const screenState = idleDetector.screenState; // 'locked' ou 'unlocked'
+
+      console.log(`État utilisateur : ${userState}, État écran : ${screenState}`);
+
+      if (userState === 'idle') {
+        alert("Vous êtes inactif. Revenez pour continuer.");
+      }
+    });
+
+    await idleDetector.start({ threshold: 60000 }); // Inactivité détectée après 60 secondes
+    console.log('Idle Detection activée.');
+  } catch (error) {
+    console.error('Erreur lors de la configuration de l\'Idle Detection API :', error);
+  }
+}
+
 async function getUserById(userId: string): Promise<User | null> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
@@ -182,4 +216,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   startCamera();
+});
+
+document.getElementById('startIdleDetection').addEventListener('click', () => {
+  setupIdleDetection();
 });
