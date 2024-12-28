@@ -1,17 +1,14 @@
 // Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 6); // Incrémentez la version (4 ici)
+    const request = indexedDB.open('UserDatabase', 6);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      // Supprimez l'ancien Object Store s'il existe
       if (db.objectStoreNames.contains('users')) {
         db.deleteObjectStore('users');
       }
-
-      // Créez un nouveau Object Store avec `id` comme clé primaire
       db.createObjectStore('users', { keyPath: 'id' });
     };
 
@@ -24,7 +21,7 @@ function initDB(): Promise<IDBDatabase> {
 interface User {
   id: string;
   username: string;
-  profileImage: string; // Obligatoire pour garantir la conformité
+  profileImage: string;
 }
 
 // Fonction pour récupérer un utilisateur par ID
@@ -33,35 +30,66 @@ async function getUserById(userId: string): Promise<User | null> {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readonly');
     const store = transaction.objectStore('users');
-    const request = store.get(userId); // Récupère par id (clé primaire)
+    const request = store.get(userId);
 
     request.onsuccess = () => {
       const user = request.result;
-      if (user) {
-        resolve(user as User);
-      } else {
-        resolve(null);
-      }
+      resolve(user ? (user as User) : null);
     };
     request.onerror = () => reject('Erreur lors de la récupération du profil.');
   });
 }
 
 // Fonction pour sauvegarder les modifications d'un utilisateur
-async function updateUser ( user : { id : string; profileImage : string; username : string } ): Promise<void> {
+async function updateUser(user: User): Promise<void> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readwrite');
     const store = transaction.objectStore('users');
-
     const request = store.put(user);
 
-    request.onsuccess = () => resolve();
+    request.onsuccess = async () => {
+      await notifyUser('Votre photo de profil a été mise à jour avec succès !');
+      sendPushNotification('Profil mis à jour', 'Votre photo de profil a été mise à jour avec succès.');
+      resolve();
+    };
+
     request.onerror = () => reject('Erreur lors de la mise à jour du profil.');
   });
 }
 
-// Active la caméra et capture une photo
+// Fonction pour afficher une notification locale
+async function notifyUser(message: string) {
+  if (!('Notification' in window)) {
+    console.warn('Les notifications ne sont pas prises en charge par ce navigateur.');
+    return;
+  }
+
+  if (Notification.permission === 'granted') {
+    new Notification(message);
+  } else if (Notification.permission !== 'denied') {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      new Notification(message);
+    }
+  }
+}
+
+// Fonction pour envoyer une notification push
+function sendPushNotification(title: string, body: string) {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification(title, {
+        body: body,
+        icon: '/icon.png',
+      });
+    }).catch((error) => {
+      console.error('Erreur lors de l\'envoi de la notification push :', error);
+    });
+  }
+}
+
+// Capture une photo et met à jour le profil
 function startCamera() {
   const video = document.getElementById('camera') as HTMLVideoElement;
   const canvas = document.getElementById('canvas') as HTMLCanvasElement;
@@ -77,13 +105,29 @@ function startCamera() {
              alert("Impossible d'accéder à la caméra.");
            });
 
-  document.getElementById('captureButton')?.addEventListener('click', () => {
+  document.getElementById('captureButton')?.addEventListener('click', async () => {
     if (context) {
       context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png'); // Capture de la photo en base64
-      (document.getElementById('profileImage') as HTMLInputElement).value = imageData;
-      const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
-      profileImageDisplay.src = imageData;
+      const imageData = canvas.toDataURL('image/png');
+      const userId = localStorage.getItem('idUser');
+
+      if (userId) {
+        const updatedUser = {
+          id: userId,
+          username: (document.getElementById('username') as HTMLInputElement).value,
+          profileImage: imageData,
+        };
+
+        try {
+          await updateUser(updatedUser);
+          alert('Photo et profil mis à jour avec succès !');
+        } catch (error) {
+          console.error(error);
+          alert('Erreur lors de la mise à jour du profil.');
+        }
+      } else {
+        alert('Utilisateur non connecté.');
+      }
     }
   });
 }
@@ -99,12 +143,12 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
   }
 
   const username = (document.getElementById('username') as HTMLInputElement).value;
-  const profileImage = (document.getElementById('profileImage') as HTMLInputElement).value;
+  const profileImage = (document.getElementById('profileImage') as HTMLInputElement).value || '';
 
   const updatedUser: { id : string; profileImage : string; username : string } = {
     id: userId,
     username,
-    profileImage
+    profileImage, // Conservez l'image actuelle si elle n'est pas modifiée
   };
 
   try {
@@ -123,7 +167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert('Utilisateur non connecté.');
     return;
   }
-  debugger
+
   const user = await getUserById(userId);
 
   if (user) {
@@ -137,6 +181,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     alert('Utilisateur non trouvé.');
   }
 
-  // Démarre la caméra pour la capture de photo
   startCamera();
 });
