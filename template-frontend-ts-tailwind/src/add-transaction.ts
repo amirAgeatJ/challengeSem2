@@ -54,7 +54,7 @@ async function getUserBudget(userId: string): Promise<any> {
     const request = store.get(userId);
 
     request.onsuccess = () =>
-      resolve(request.result || { userId, global: 0, transport: 0, leisure: 0, health: 0, housing: 0 });
+      resolve(request.result || { userId, global: 0, transport: 0, leisure: 0, health: 0, housing: 0, education: 0 });
     request.onerror = () => reject(request.error);
   });
 }

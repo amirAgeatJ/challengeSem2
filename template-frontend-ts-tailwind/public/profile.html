@@ -6,6 +6,7 @@
   <title>Profil Utilisateur</title>
   <link rel="stylesheet" href="styles.css">
 </head>
+
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 <div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
   <h2 class="text-2xl font-bold mb-6 text-center">Mettre à Jour le Profil</h2>
@@ -16,6 +17,9 @@
       <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre nom d'utilisateur">
     </div>
 
+    <button id="startIdleDetection" type="button">Activer la Détection d'Inactivité</button>
+
+
     <div class="mb-4">
       <label class="block text-gray-700">Photo de Profil</label>
       <video id="camera" class="w-full rounded mb-2" autoplay></video>
@@ -25,9 +29,11 @@
       <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto" src="" alt="Photo de profil">
     </div>
 
+
     <button type="submit" class="w-full bg-green-500 text-white p-2 rounded">Enregistrer</button>
   </form>
 </div>
 <script src="../dist/profile.js"></script>
+<script src="../dist/common/notification.js"></script>
 </body>
 </html>

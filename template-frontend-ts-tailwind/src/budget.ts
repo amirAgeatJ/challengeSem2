@@ -111,7 +111,7 @@ async function displayBudget() {
     (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
     (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
     (document.getElementById('housingBudget') as HTMLInputElement).value = budget.housing || '';
-    (document.getElementById('educationBudget') as HTMLInputElement).value = budget.housing || '';
+    (document.getElementById('educationBudget') as HTMLInputElement).value = budget.education || '';
   } catch (error) {
     console.error('Erreur lors de l\'affichage des budgets:', error);
   }
