@@ -1,36 +1,26 @@
 // Initialise la base de données IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('TransactionDatabase', 4); // Version mise à jour pour modifications
+    const request = indexedDB.open('TransactionDatabase', 4);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
-      // Crée l'Object Store pour les transactions
+      // Crée les Object Stores si nécessaires
       if (!db.objectStoreNames.contains('transactions')) {
         db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
       }
-
-      // Crée l'Object Store pour les budgets
       if (!db.objectStoreNames.contains('budgets')) {
         db.createObjectStore('budgets', { keyPath: 'userId' });
       }
-      console.log('IndexedDB mise à jour et initialisée.');
     };
 
-    request.onsuccess = () => {
-      console.log('IndexedDB ouverte avec succès.');
-      resolve(request.result);
-    };
-
-    request.onerror = (event) => {
-      console.error('Erreur d\'ouverture de la base IndexedDB:', event);
-      reject(request.error);
-    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
   });
 }
 
-// Enregistre les budgets pour un utilisateur
+// Enregistre un budget dans IndexedDB
 async function saveBudget(budgetData: {
   global: number;
   transport: number;
@@ -41,33 +31,30 @@ async function saveBudget(budgetData: {
 }) {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
-    alert("Erreur : Utilisateur non connecté.");
+    alert('Erreur : Utilisateur non connecté.');
     return;
   }
 
-  try {
-    const db = await initDB();
-    const transaction = db.transaction('budgets', 'readwrite');
-    const store = transaction.objectStore('budgets');
+  const db = await initDB();
+  const transaction = db.transaction('budgets', 'readwrite');
+  const store = transaction.objectStore('budgets');
 
-    const userBudget = { userId, ...budgetData };
+  const userBudget = { userId, ...budgetData };
 
+  return new Promise((resolve, reject) => {
     const request = store.put(userBudget);
     request.onsuccess = () => {
-      console.log('Budget enregistré avec succès :', userBudget);
       alert('Budget enregistré avec succès !');
+      resolve(request.result);
     };
-    request.onerror = (e) => {
-      console.error('Erreur lors de l\'enregistrement du budget:', e);
+    request.onerror = () => {
       alert('Erreur lors de l\'enregistrement du budget.');
+      reject(request.error);
     };
-  } catch (error) {
-    console.error('Erreur inattendue:', error);
-    alert('Une erreur inattendue est survenue.');
-  }
+  });
 }
 
-// Récupère les budgets pour l'utilisateur connecté
+// Récupère un budget depuis IndexedDB
 async function getBudget(): Promise<any | null> {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
@@ -75,49 +62,79 @@ async function getBudget(): Promise<any | null> {
     return null;
   }
 
-  try {
-    const db = await initDB();
-    return new Promise((resolve, reject) => {
-      const transaction = db.transaction('budgets', 'readonly');
-      const store = transaction.objectStore('budgets');
-      const request = store.get(userId);
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('budgets', 'readonly');
+    const store = transaction.objectStore('budgets');
+    const request = store.get(userId);
 
-      request.onsuccess = () => {
-        console.log('Budget récupéré:', request.result);
-        resolve(request.result);
-      };
-      request.onerror = (e) => {
-        console.error('Erreur lors de la récupération du budget:', e);
-        reject(e);
-      };
-    });
-  } catch (error) {
-    console.error('Erreur inattendue lors de la récupération:', error);
-    return null;
-  }
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject('Erreur lors de la récupération du budget.');
+  });
 }
 
 // Affiche les budgets dans les champs du formulaire
 async function displayBudget() {
-  try {
-    const budget = await getBudget();
-    if (!budget) {
-      console.log('Aucun budget trouvé.');
-      return;
-    }
-
-    (document.getElementById('globalBudget') as HTMLInputElement).value = budget.global || '';
-    (document.getElementById('transportBudget') as HTMLInputElement).value = budget.transport || '';
-    (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
-    (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
-    (document.getElementById('housingBudget') as HTMLInputElement).value = budget.housing || '';
-    (document.getElementById('educationBudget') as HTMLInputElement).value = budget.education || '';
-  } catch (error) {
-    console.error('Erreur lors de l\'affichage des budgets:', error);
+  const budget = await getBudget();
+  if (!budget) {
+    console.log('Aucun budget trouvé.');
+    return;
   }
+
+  (document.getElementById('globalBudget') as HTMLInputElement).value = budget.global || '';
+  (document.getElementById('transportBudget') as HTMLInputElement).value = budget.transport || '';
+  (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
+  (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
+  (document.getElementById('housingBudget') as HTMLInputElement).value = budget.housing || '';
+  (document.getElementById('educationBudget') as HTMLInputElement).value = budget.education || '';
 }
 
-// Écouteur pour le bouton d'enregistrement des budgets
+// Affiche un graphique de répartition des budgets
+async function displayBudgetChart() {
+  const budget = await getBudget();
+  if (!budget) {
+    console.error("Aucun budget trouvé pour l'utilisateur connecté.");
+    return;
+  }
+
+  const categories = ['transport', 'leisure', 'health', 'housing', 'education'];
+  const labels = ['Transport', 'Loisir', 'Santé', 'Logement', 'Éducation'];
+  const data = categories.map((cat) => budget[cat] || 0);
+
+  const canvas = document.getElementById('budgetChart') as HTMLCanvasElement;
+  const ctx = canvas?.getContext('2d');
+
+  if (!ctx) {
+    console.error('Impossible d’obtenir le contexte du Canvas.');
+    return;
+  }
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [
+        {
+          data,
+          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: (context) => `${context.label}: ${context.raw} €`,
+          },
+        },
+      },
+    },
+  });
+}
+
+// Gestion des événements
 document.getElementById('saveBudgets')?.addEventListener('click', async () => {
   const budgets = {
     global: Number((document.getElementById('globalBudget') as HTMLInputElement).value) || 0,
@@ -129,7 +146,11 @@ document.getElementById('saveBudgets')?.addEventListener('click', async () => {
   };
 
   await saveBudget(budgets);
+  await displayBudgetChart();
 });
 
-// Afficher les budgets lors du chargement de la page
-document.addEventListener('DOMContentLoaded', displayBudget);
+// Initialisation
+document.addEventListener('DOMContentLoaded', async () => {
+  await displayBudget();
+  await displayBudgetChart();
+});

@@ -26,10 +26,7 @@
 </div>
 
 <!-- Graphique Budget -->
-<div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
-    <h2 class="text-xl font-bold mb-4 text-center">Répartition des Budgets</h2>
-    <canvas id="budgetChart"></canvas>
-</div>
+
 
 <!-- Section Transactions -->
 <div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
@@ -44,9 +41,23 @@
     <button id="fullscreenButton" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
         Plein Écran
     </button>
-
-
 </div>
+
+<div>
+    <button id="toggleCurrencyButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+        Convertir en USD
+    </button>
+</div>
+
+
+
+<!-- Carte Somme des Dépenses et Revenus -->
+<div id="summaryCard" class="fixed top-4 left-4 bg-white shadow-lg rounded p-4 w-64">
+    <h3 class="text-lg font-bold mb-2">Résumé</h3>
+    <p><strong>Total Dépenses :</strong> <span id="totalExpenses">0</span> </p>
+    <p><strong>Total Revenus :</strong> <span id="totalIncome">0</span> </p>
+</div>
+
 
 <script src="../dist/about.js"></script>
 </body>

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Budget - Gestion des Budgets</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
@@ -57,6 +58,12 @@
   </div>
 </div>
 
+  <div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
+    <h2 class="text-xl font-bold mb-4 text-center">Répartition des Budgets</h2>
+    <canvas id="budgetChart"></canvas>
+  </div>
+
 <script src="../dist/budget.js"></script>
+</body>
 </body>
 </html>

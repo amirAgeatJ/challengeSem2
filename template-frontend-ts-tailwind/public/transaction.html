@@ -1,20 +1,32 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Transaction History</title>
+  <!-- Votre CSS (ou Tailwind, ou autre) -->
   <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-  <div class="container">
-    <div class="header">
-      <h2>Transaction History</h2>
-    </div>
-    <div id="transactionList" class="space-y-4">
-      <!-- Les transactions seront insérées ici -->
-    </div>
+<body class="bg-gray-100 min-h-screen">
+<div class="container mx-auto px-4 py-6">
+  <!-- Barre supérieure : bouton + titre -->
+  <div class="flex items-center mb-6">
+    <button
+        onclick="window.location.href='add-transaction.html'"
+        class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-4"
+    >
+      Ajouter une transaction
+    </button>
+    <h2 class="text-2xl font-bold">Historique des transactions</h2>
   </div>
-  <script src="../dist/transaction.js"></script>
+
+  <!-- Zone d'affichage des transactions -->
+  <div id="transactionList" class="space-y-2">
+    <!-- Les transactions seront insérées ici par le script transaction.js -->
+  </div>
+</div>
+
+<!-- Script compilé depuis votre TypeScript -->
+<script src="../dist/transaction.js"></script>
 </body>
 </html>

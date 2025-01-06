@@ -6,6 +6,7 @@ function initDB(): Promise<IDBDatabase> {
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
 
+      // Supprime l'ancien objectStore 'users' si présent, et le recrée
       if (db.objectStoreNames.contains('users')) {
         db.deleteObjectStore('users');
       }
@@ -17,16 +18,51 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
-// Interface utilisateur
 interface User {
   id: string;
   username: string;
   profileImage: string;
 }
 
-// Fonction pour récupérer un utilisateur par ID
+// ------------------
+// 1) Battery Status
+// ------------------
+async function setupBatteryStatus(): Promise<void> {
+  const batteryStatusDiv = document.getElementById('batteryStatus');
+  if (!batteryStatusDiv) return;
 
+  // Vérifier si l'API est disponible
+  if (!('getBattery' in navigator)) {
+    batteryStatusDiv.textContent = "Battery API non supportée";
+    return;
+  }
 
+  try {
+    // TypeScript n'a parfois pas la définition : (navigator as any).getBattery()
+    const battery = await (navigator as any).getBattery();
+
+    // Fonction pour mettre à jour l'affichage
+    function updateBatteryInfo() {
+      const levelPercent = Math.round(battery.level * 100);
+      const chargingSymbol = battery.charging ? '⚡' : '';
+      batteryStatusDiv.textContent = `Batterie : ${levelPercent}% ${chargingSymbol}`;
+    }
+
+    // Écouter les changements
+    battery.addEventListener('levelchange', updateBatteryInfo);
+    battery.addEventListener('chargingchange', updateBatteryInfo);
+
+    // Initialiser l'affichage
+    updateBatteryInfo();
+  } catch (error) {
+    console.error("Erreur lors de l'obtention de la batterie :", error);
+    batteryStatusDiv.textContent = "Impossible d'obtenir la batterie";
+  }
+}
+
+// ------------------
+// 2) Idle Detection
+// ------------------
 async function setupIdleDetection() {
   if (!('IdleDetector' in window)) {
     console.warn('Idle Detection API non prise en charge dans ce navigateur.');
@@ -42,7 +78,7 @@ async function setupIdleDetection() {
 
     const idleDetector = new IdleDetector();
     idleDetector.addEventListener('change', () => {
-      const userState = idleDetector.userState; // 'active' ou 'idle'
+      const userState = idleDetector.userState;   // 'active' ou 'idle'
       const screenState = idleDetector.screenState; // 'locked' ou 'unlocked'
 
       console.log(`État utilisateur : ${userState}, État écran : ${screenState}`);
@@ -52,13 +88,16 @@ async function setupIdleDetection() {
       }
     });
 
-    await idleDetector.start({ threshold: 60000 }); // Inactivité détectée après 60 secondes
+    await idleDetector.start({ threshold: 60000 }); // 60 sec
     console.log('Idle Detection activée.');
   } catch (error) {
-    console.error('Erreur lors de la configuration de l\'Idle Detection API :', error);
+    console.error("Erreur lors de la configuration de l'Idle Detection API :", error);
   }
 }
 
+// ------------------
+// 3) Récupérer un user
+// ------------------
 async function getUserById(userId: string): Promise<User | null> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
@@ -74,7 +113,9 @@ async function getUserById(userId: string): Promise<User | null> {
   });
 }
 
-// Fonction pour sauvegarder les modifications d'un utilisateur
+// ------------------
+// 4) Mettre à jour un user
+// ------------------
 async function updateUser(user: User): Promise<void> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
@@ -84,7 +125,10 @@ async function updateUser(user: User): Promise<void> {
 
     request.onsuccess = async () => {
       await notifyUser('Votre photo de profil a été mise à jour avec succès !');
-      sendPushNotification('Profil mis à jour', 'Votre photo de profil a été mise à jour avec succès.');
+      sendPushNotification(
+        'Profil mis à jour',
+        'Votre photo de profil a été mise à jour avec succès.'
+      );
       resolve();
     };
 
@@ -92,7 +136,9 @@ async function updateUser(user: User): Promise<void> {
   });
 }
 
-// Fonction pour afficher une notification locale
+// ------------------
+// 5) Notifications locales
+// ------------------
 async function notifyUser(message: string) {
   if (!('Notification' in window)) {
     console.warn('Les notifications ne sont pas prises en charge par ce navigateur.');
@@ -109,64 +155,75 @@ async function notifyUser(message: string) {
   }
 }
 
-// Fonction pour envoyer une notification push
+// ------------------
+// 6) Notifications push
+// ------------------
 function sendPushNotification(title: string, body: string) {
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then((registration) => {
-      registration.showNotification(title, {
-        body: body,
-        icon: '/icon.png',
+    navigator.serviceWorker
+      .ready
+      .then((registration) => {
+        registration.showNotification(title, {
+          body: body,
+          icon: '/icon.png',
+        });
+      })
+      .catch((error) => {
+        console.error("Erreur lors de l'envoi de la notification push :", error);
       });
-    }).catch((error) => {
-      console.error('Erreur lors de l\'envoi de la notification push :', error);
-    });
   }
 }
 
-// Capture une photo et met à jour le profil
+// ------------------
+// 7) Caméra
+// ------------------
 function startCamera() {
-  const video = document.getElementById('camera') as HTMLVideoElement;
-  const canvas = document.getElementById('canvas') as HTMLCanvasElement;
+  const video = document.getElementById('camera') as HTMLVideoElement | null;
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement | null;
+  if (!video || !canvas) return;
+
   const context = canvas.getContext('2d');
 
-  navigator.mediaDevices.getUserMedia({ video: true })
-           .then((stream) => {
-             video.srcObject = stream;
-             video.play();
-           })
-           .catch((error) => {
-             console.error("Erreur d'accès à la caméra :", error);
-             alert("Impossible d'accéder à la caméra.");
-           });
+  navigator.mediaDevices
+    .getUserMedia({ video: true })
+    .then((stream) => {
+      video.srcObject = stream;
+      video.play();
+    })
+    .catch((error) => {
+      console.error("Erreur d'accès à la caméra :", error);
+      alert("Impossible d'accéder à la caméra.");
+    });
 
   document.getElementById('captureButton')?.addEventListener('click', async () => {
-    if (context) {
-      context.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const imageData = canvas.toDataURL('image/png');
-      const userId = localStorage.getItem('idUser');
+    if (!context) return;
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL('image/png');
+    const userId = localStorage.getItem('idUser');
 
-      if (userId) {
-        const updatedUser = {
-          id: userId,
-          username: (document.getElementById('username') as HTMLInputElement).value,
-          profileImage: imageData,
-        };
+    if (userId) {
+      const updatedUser: User = {
+        id: userId,
+        username: (document.getElementById('username') as HTMLInputElement)?.value || '',
+        profileImage: imageData,
+      };
 
-        try {
-          await updateUser(updatedUser);
-          alert('Photo et profil mis à jour avec succès !');
-        } catch (error) {
-          console.error(error);
-          alert('Erreur lors de la mise à jour du profil.');
-        }
-      } else {
-        alert('Utilisateur non connecté.');
+      try {
+        await updateUser(updatedUser);
+        alert('Photo et profil mis à jour avec succès !');
+      } catch (error) {
+        console.error(error);
+        alert('Erreur lors de la mise à jour du profil.');
       }
+    } else {
+      alert('Utilisateur non connecté.');
     }
   });
 }
 
-// Gestionnaire d'événements pour soumettre le formulaire
+// ------------------
+// 8) Gestion formulaire
+// ------------------
 document.getElementById('profileForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
@@ -176,13 +233,13 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
     return;
   }
 
-  const username = (document.getElementById('username') as HTMLInputElement).value;
-  const profileImage = (document.getElementById('profileImage') as HTMLInputElement).value || '';
+  const username = (document.getElementById('username') as HTMLInputElement)?.value || '';
+  const profileImage = (document.getElementById('profileImage') as HTMLInputElement)?.value || '';
 
-  const updatedUser: { id : string; profileImage : string; username : string } = {
+  const updatedUser: User = {
     id: userId,
     username,
-    profileImage, // Conservez l'image actuelle si elle n'est pas modifiée
+    profileImage,
   };
 
   try {
@@ -194,8 +251,14 @@ document.getElementById('profileForm')?.addEventListener('submit', async (event)
   }
 });
 
-// Chargement des informations utilisateur au démarrage
+// ------------------
+// 9) Au chargement du DOM
+// ------------------
 document.addEventListener('DOMContentLoaded', async () => {
+  // 9.1 Setup Battery
+  setupBatteryStatus();
+
+  // 9.2 Charger l'utilisateur
   const userId = localStorage.getItem('idUser');
   if (!userId) {
     alert('Utilisateur non connecté.');
@@ -206,18 +269,26 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (user) {
     (document.getElementById('username') as HTMLInputElement).value = user.username;
-    const profileImageInput = document.getElementById('profileImage') as HTMLInputElement;
-    profileImageInput.value = user.profileImage;
+    const profileImageInput = document.getElementById('profileImage') as HTMLInputElement | null;
+    if (profileImageInput) {
+      profileImageInput.value = user.profileImage;
+    }
 
-    const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement;
-    profileImageDisplay.src = user.profileImage;
+    const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement | null;
+    if (profileImageDisplay) {
+      profileImageDisplay.src = user.profileImage;
+    }
   } else {
     alert('Utilisateur non trouvé.');
   }
 
+  // 9.3 Démarre la caméra
   startCamera();
 });
 
-document.getElementById('startIdleDetection').addEventListener('click', () => {
+// ------------------
+// 10) Démarrage de l'idle detection
+// ------------------
+document.getElementById('startIdleDetection')?.addEventListener('click', () => {
   setupIdleDetection();
 });

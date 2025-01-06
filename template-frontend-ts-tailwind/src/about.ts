@@ -1,4 +1,16 @@
-// Initialise IndexedDB pour TransactionDatabase
+/**************************************************
+ * about.ts
+ **************************************************/
+
+// ------------------------------
+// Variables globales
+// ------------------------------
+let currentCurrency: 'EUR' | 'USD' = 'EUR';
+let usdRate: number = 1; // Taux de conversion USD/EUR (par défaut = 1)
+
+// ------------------------------
+// Fonctions utilitaires
+// ------------------------------
 function initTransactionDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('TransactionDatabase', 4);
@@ -19,7 +31,6 @@ function initTransactionDB(): Promise<IDBDatabase> {
   });
 }
 
-// Initialise IndexedDB pour UserDatabase
 function initUserDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open('UserDatabase', 6);
@@ -37,7 +48,9 @@ function initUserDB(): Promise<IDBDatabase> {
   });
 }
 
-// Récupère le budget d'un utilisateur
+// ------------------------------
+// Fonctions de récupération (CRUD)
+// ------------------------------
 async function getUserBudget(userId: string): Promise<any | null> {
   const db = await initTransactionDB();
   return new Promise((resolve, reject) => {
@@ -50,7 +63,6 @@ async function getUserBudget(userId: string): Promise<any | null> {
   });
 }
 
-// Récupère les transactions pour un utilisateur
 async function getTransactionsForUser(userId: string): Promise<any[]> {
   const db = await initTransactionDB();
   return new Promise((resolve, reject) => {
@@ -58,13 +70,15 @@ async function getTransactionsForUser(userId: string): Promise<any[]> {
     const store = transaction.objectStore('transactions');
     const request = store.getAll();
 
-    request.onsuccess = () =>
-      resolve((request.result || []).filter((t: any) => t.userId === userId));
+    request.onsuccess = () => {
+      const allTransactions = request.result || [];
+      const userTransactions = allTransactions.filter((t: any) => t.userId === userId);
+      resolve(userTransactions);
+    };
     request.onerror = () => reject('Erreur lors de la récupération des transactions.');
   });
 }
 
-// Récupère un utilisateur par ID
 async function getUserById(userId: string): Promise<any | null> {
   const db = await initUserDB();
   return new Promise((resolve, reject) => {
@@ -73,11 +87,31 @@ async function getUserById(userId: string): Promise<any | null> {
     const request = store.get(userId);
 
     request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject('Erreur lors de la récupération de l’utilisateur.');
+    request.onerror = () => reject("Erreur lors de la récupération de l'utilisateur.");
   });
 }
 
-// Affiche le résumé des budgets
+// ------------------------------
+// Gestion du taux de change
+// ------------------------------
+async function fetchUsdRate(): Promise<void> {
+  try {
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/EUR');
+    const data = await response.json();
+    // Exemple: data.rates.USD = 1.1  => 1 EUR = 1.1 USD
+    usdRate = data.rates.USD;
+  } catch (error) {
+    console.error('Erreur lors de la récupération du taux de change :', error);
+  }
+}
+
+// ------------------------------
+// Fonctions d'affichage
+// ------------------------------
+
+/**
+ * Affiche le budget de l'utilisateur
+ */
 async function displayUserBudget() {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
@@ -93,17 +127,22 @@ async function displayUserBudget() {
     return;
   }
 
+  const factor = currentCurrency === 'USD' ? usdRate : 1;
+  const symbol = currentCurrency === 'USD' ? '$' : '€';
+
   budgetSummary.innerHTML = `
-    <p><strong>Global :</strong> ${budget.global || 0} €</p>
-    <p><strong>Transport :</strong> ${budget.transport || 0} €</p>
-    <p><strong>Loisir :</strong> ${budget.leisure || 0} €</p>
-    <p><strong>Santé :</strong> ${budget.health || 0} €</p>
-    <p><strong>Logement :</strong> ${budget.housing || 0} €</p>
-    <p><strong>Éducation :</strong> ${budget.education || 0} €</p>
+    <p><strong>Global :</strong> ${(budget.global || 0) * factor} ${symbol}</p>
+    <p><strong>Transport :</strong> ${(budget.transport || 0) * factor} ${symbol}</p>
+    <p><strong>Loisir :</strong> ${(budget.leisure || 0) * factor} ${symbol}</p>
+    <p><strong>Santé :</strong> ${(budget.health || 0) * factor} ${symbol}</p>
+    <p><strong>Logement :</strong> ${(budget.housing || 0) * factor} ${symbol}</p>
+    <p><strong>Éducation :</strong> ${(budget.education || 0) * factor} ${symbol}</p>
   `;
 }
 
-// Affiche le graphique des budgets
+/**
+ * Affiche le graphique des budgets
+ */
 async function displayBudgetChart() {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
@@ -119,13 +158,20 @@ async function displayBudgetChart() {
 
   const categories = ['transport', 'leisure', 'health', 'housing', 'education'];
   const labels = ['Transport', 'Loisir', 'Santé', 'Logement', 'Éducation'];
-  const data = categories.map((cat) => budget[cat] || 0);
+
+  // Conversion en fonction de la devise
+  const factor = currentCurrency === 'USD' ? usdRate : 1;
+  const data = categories.map((cat) => (budget[cat] || 0) * factor);
 
   const canvas = document.getElementById('budgetChart') as HTMLCanvasElement;
-  const ctx = canvas?.getContext('2d');
+  if (!canvas) {
+    console.error("Canvas 'budgetChart' introuvable.");
+    return;
+  }
 
+  const ctx = canvas.getContext('2d');
   if (!ctx) {
-    console.error('Impossible d’obtenir le contexte du Canvas.');
+    console.error("Impossible d’obtenir le contexte 2D du Canvas.");
     return;
   }
 
@@ -146,7 +192,11 @@ async function displayBudgetChart() {
         legend: { position: 'top' },
         tooltip: {
           callbacks: {
-            label: (context) => `${context.label}: ${context.raw} €`,
+            label: (context) => {
+              // Ajout du symbole monétaire dynamique
+              const symbol = currentCurrency === 'USD' ? '$' : '€';
+              return `${context.label}: ${context.raw} ${symbol}`;
+            },
           },
         },
       },
@@ -154,48 +204,46 @@ async function displayBudgetChart() {
   });
 }
 
-declare class IdleDetector extends EventTarget {
-  static requestPermission(): Promise<"granted" | "denied">;
-  start(options: { threshold: number }): Promise<void>;
-  readonly userState: "active" | "idle";
-  readonly screenState: "locked" | "unlocked";
-}
-
-
-async function setupIdleDetection() {
-  if (!('IdleDetector' in window)) {
-    console.warn('Idle Detection API non prise en charge dans ce navigateur.');
+/**
+ * Affiche la somme des dépenses et des revenus
+ */
+async function displayTransactionSummary() {
+  const userId = localStorage.getItem('idUser');
+  if (!userId) {
+    console.error('Utilisateur non connecté.');
     return;
   }
 
-  try {
-    const permission = await IdleDetector.requestPermission();
-    if (permission !== 'granted') {
-      console.warn("Permission pour l'API Idle Detection refusée.");
-      return;
-    }
+  const transactions = await getTransactionsForUser(userId);
+  if (!transactions || transactions.length === 0) {
+    console.log('Aucune transaction trouvée.');
+    return;
+  }
 
-    const idleDetector = new IdleDetector();
-    idleDetector.addEventListener('change', () => {
-      const userState = idleDetector.userState; // 'active' ou 'idle'
-      const screenState = idleDetector.screenState; // 'locked' ou 'unlocked'
+  const totalExpenses = transactions
+    .filter((t) => t.type === 'expense')
+    .reduce((sum, t) => sum + t.amount, 0);
 
-      console.log(`État utilisateur : ${userState}, État écran : ${screenState}`);
+  const totalIncome = transactions
+    .filter((t) => t.type === 'income')
+    .reduce((sum, t) => sum + t.amount, 0);
 
-      if (userState === 'idle') {
-        alert("Vous êtes inactif. Revenez pour continuer.");
-      }
-    });
+  const totalExpensesElement = document.getElementById('totalExpenses');
+  const totalIncomeElement = document.getElementById('totalIncome');
 
-    await idleDetector.start({ threshold: 60000 }); // Inactivité détectée après 60 secondes
-    console.log('Idle Detection activée.');
-  } catch (error) {
-    console.error('Erreur lors de la configuration de l\'Idle Detection API :', error);
+  if (totalExpensesElement && totalIncomeElement) {
+    // Détermine le facteur et le symbole
+    const factor = currentCurrency === 'USD' ? usdRate : 1;
+    const symbol = currentCurrency === 'USD' ? '$' : '€';
+
+    totalExpensesElement.textContent = (totalExpenses * factor).toFixed(2) + ' ' + symbol;
+    totalIncomeElement.textContent = (totalIncome * factor).toFixed(2) + ' ' + symbol;
   }
 }
 
-
-// Affiche les transactions avec informations utilisateur
+/**
+ * Affiche la liste des transactions
+ */
 async function displayTransactions() {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
@@ -213,6 +261,7 @@ async function displayTransactions() {
     return;
   }
 
+  // Enrichit les transactions avec infos user
   const enhancedTransactions = await Promise.all(
     transactions.map(async (transaction) => {
       const user = await getUserById(transaction.userId);
@@ -224,34 +273,78 @@ async function displayTransactions() {
     })
   );
 
+  // Conversion
+  const factor = currentCurrency === 'USD' ? usdRate : 1;
+  const symbol = currentCurrency === 'USD' ? '$' : '€';
+
   transactionList.innerHTML = enhancedTransactions
     .map(
-      (transaction) => `
-        <div class="p-4 border border-gray-300 rounded flex items-center gap-4">
-          <img src="${transaction.userPhoto}" alt="Photo utilisateur" class="w-10 h-10 rounded-full">
-          <div>
-            <p><strong>Utilisateur :</strong> ${transaction.username}</p>
-            <p><strong>Type :</strong> ${transaction.type}</p>
-            <p><strong>Catégorie :</strong> ${transaction.category}</p>
-            <p><strong>Montant :</strong> ${transaction.amount.toFixed(2)} €</p>
-            <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
+      (transaction) => {
+        const convertedAmount = (transaction.amount * factor).toFixed(2);
+        return `
+          <div class="p-4 border border-gray-300 rounded flex items-center gap-4">
+            <img src="${transaction.userPhoto}" alt="Photo utilisateur" class="w-10 h-10 rounded-full">
+            <div>
+              <p><strong>Utilisateur :</strong> ${transaction.username}</p>
+              <p><strong>Type :</strong> ${transaction.type}</p>
+              <p><strong>Catégorie :</strong> ${transaction.category}</p>
+              <p><strong>Montant :</strong> ${convertedAmount} ${symbol}</p>
+              <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
+            </div>
           </div>
-        </div>
-      `
+        `;
+      }
     )
     .join('');
 }
 
-// Initialisation
+// ------------------------------
+// Code principal : DOMContentLoaded
+// ------------------------------
 document.addEventListener('DOMContentLoaded', async () => {
   try {
+    // 1) Récupère le taux USD/EUR au chargement
+    await fetchUsdRate();
+
+    // 2) Affiche initialement (en EUR par défaut)
     await displayUserBudget();
     await displayBudgetChart();
     await displayTransactions();
+    await displayTransactionSummary();
+
+    // 3) Gère le bouton de conversion (basculer EUR <-> USD)
+    const toggleCurrencyButton = document.getElementById('toggleCurrencyButton');
+    if (toggleCurrencyButton) {
+      toggleCurrencyButton.addEventListener('click', async () => {
+        if (currentCurrency === 'EUR') {
+          currentCurrency = 'USD';
+          toggleCurrencyButton.textContent = 'Convertir en EUR';
+        } else {
+          currentCurrency = 'EUR';
+          toggleCurrencyButton.textContent = 'Convertir en USD';
+        }
+
+        // On réaffiche tout après changement de devise
+        await displayUserBudget();
+        await displayBudgetChart();
+        await displayTransactions();
+        await displayTransactionSummary();
+      });
+    }
+
+    // 4) Gère le bouton plein écran
+    const fullscreenButton = document.getElementById('fullscreenButton');
+    if (fullscreenButton) {
+      fullscreenButton.addEventListener('click', () => {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen();
+        } else if (document.exitFullscreen) {
+          document.exitFullscreen();
+        }
+      });
+    }
+
   } catch (error) {
     console.error('Erreur lors de l’affichage des données :', error);
   }
 });
-
-
-
