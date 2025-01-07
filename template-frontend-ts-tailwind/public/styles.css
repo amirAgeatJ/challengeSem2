@@ -550,6 +550,9 @@ video {
 .top-0 {
   top: 0px;
 }
+.bottom-4 {
+  bottom: 1rem;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -722,6 +725,9 @@ video {
 .p-8 {
   padding: 2rem;
 }
+.p-6 {
+  padding: 1.5rem;
+}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -761,6 +767,10 @@ video {
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+.text-3xl {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
 }
 .font-bold {
   font-weight: 700;

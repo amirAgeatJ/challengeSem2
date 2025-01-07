@@ -162,37 +162,37 @@ async function displayTransactions() {
     })
   );
 
-  // Affichage sur une seule ligne :
-  // - On utilise `flex items-center gap-4` pour aligner horizontalement
-  // - On place le bouton "Supprimer" à droite (ml-auto si souhaité)
+  // Remplacement des types "expense" et "income" par leurs traductions
   transactionList.innerHTML = enhancedTransactions
     .map(
-      (transaction) => `
-        <div class="flex items-center gap-4 p-4 border border-gray-300 rounded">
-          <img
-            src="${transaction.userPhoto}"
-            alt="Photo utilisateur"
-            class="w-10 h-10 rounded-full"
-          />
-          <!-- On met toutes les infos sur la même ligne -->
-          <span class="font-semibold">${transaction.username}</span>
-          <span>${transaction.type}</span>
-          <span>${transaction.category}</span>
-          <span>${transaction.amount.toFixed(2)} €</span>
-          <span>${new Date(transaction.date).toLocaleDateString()}</span>
+      (transaction) => {
+        const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense"; // Traduction
+        return `
+          <div class="flex items-center gap-4 p-4 border border-gray-300 rounded">
+            <img
+              src="${transaction.userPhoto}"
+              alt="Photo utilisateur"
+              class="w-10 h-10 rounded-full"
+            />
+            <span class="font-semibold">${transaction.username}</span>
+            <span>${typeLabel}</span> <!-- Type traduit -->
+            <span>${transaction.category}</span>
+            <span>${transaction.amount.toFixed(2)} €</span>
+            <span>${new Date(transaction.date).toLocaleDateString()}</span>
 
-          <!-- Bouton Supprimer -->
-          <button
-            class="delete-button bg-red-500 text-white p-2 rounded ml-auto"
-            data-id="${transaction.id}"
-            data-type="${transaction.type}"
-            data-category="${transaction.category}"
-            data-amount="${transaction.amount}"
-          >
-            Supprimer
-          </button>
-        </div>
-      `
+            <!-- Bouton Supprimer -->
+            <button
+              class="delete-button bg-red-500 text-white p-2 rounded ml-auto"
+              data-id="${transaction.id}"
+              data-type="${transaction.type}"
+              data-category="${transaction.category}"
+              data-amount="${transaction.amount}"
+            >
+              Supprimer
+            </button>
+          </div>
+        `;
+      }
     )
     .join("");
 
@@ -221,6 +221,7 @@ async function displayTransactions() {
     });
   });
 }
+
 
 // Initialisation
 document.addEventListener("DOMContentLoaded", async () => {

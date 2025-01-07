@@ -140,68 +140,35 @@ async function displayUserBudget() {
   `;
 }
 
-/**
- * Affiche le graphique des budgets
- */
-async function displayBudgetChart() {
-  const userId = localStorage.getItem('idUser');
-  if (!userId) {
-    console.error('Utilisateur non connecté.');
-    return;
-  }
+async function displayTotalBudget() {
+    const userId = localStorage.getItem('idUser');
+    if (!userId) {
+        console.error('Utilisateur non connecté.');
+        return;
+    }
 
-  const budget = await getUserBudget(userId);
-  if (!budget) {
-    console.error("Aucun budget trouvé pour l'utilisateur connecté.");
-    return;
-  }
+    const budget = await getUserBudget(userId);
+    const totalBudgetElement = document.getElementById('totalBudget');
 
-  const categories = ['transport', 'leisure', 'health', 'housing', 'education'];
-  const labels = ['Transport', 'Loisir', 'Santé', 'Logement', 'Éducation'];
+    if (!budget || !totalBudgetElement) {
+        console.error("Aucun budget trouvé pour l'utilisateur connecté.");
+        totalBudgetElement.textContent = '0 €';
+        return;
+    }
 
-  // Conversion en fonction de la devise
-  const factor = currentCurrency === 'USD' ? usdRate : 1;
-  const data = categories.map((cat) => (budget[cat] || 0) * factor);
+    const factor = currentCurrency === 'USD' ? usdRate : 1;
+    const symbol = currentCurrency === 'USD' ? '$' : '€';
 
-  const canvas = document.getElementById('budgetChart') as HTMLCanvasElement;
-  if (!canvas) {
-    console.error("Canvas 'budgetChart' introuvable.");
-    return;
-  }
+    const totalBudget = [
+        budget.global,
+        budget.transport,
+        budget.leisure,
+        budget.health,
+        budget.housing,
+        budget.education,
+    ].reduce((sum, value) => sum + (value || 0), 0);
 
-  const ctx = canvas.getContext('2d');
-  if (!ctx) {
-    console.error("Impossible d’obtenir le contexte 2D du Canvas.");
-    return;
-  }
-
-  new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels,
-      datasets: [
-        {
-          data,
-          backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF'],
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: 'top' },
-        tooltip: {
-          callbacks: {
-            label: (context) => {
-              // Ajout du symbole monétaire dynamique
-              const symbol = currentCurrency === 'USD' ? '$' : '€';
-              return `${context.label}: ${context.raw} ${symbol}`;
-            },
-          },
-        },
-      },
-    },
-  });
+    totalBudgetElement.textContent = `${(totalBudget * factor).toFixed(2)} ${symbol}`;
 }
 
 /**
@@ -307,8 +274,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await fetchUsdRate();
 
     // 2) Affiche initialement (en EUR par défaut)
+    await displayTotalBudget();
     await displayUserBudget();
-    await displayBudgetChart();
     await displayTransactions();
     await displayTransactionSummary();
 
@@ -325,8 +292,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         // On réaffiche tout après changement de devise
+        await displayTotalBudget();
         await displayUserBudget();
-        await displayBudgetChart();
         await displayTransactions();
         await displayTransactionSummary();
       });

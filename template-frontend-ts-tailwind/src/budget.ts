@@ -81,7 +81,6 @@ async function displayBudget() {
     return;
   }
 
-  (document.getElementById('globalBudget') as HTMLInputElement).value = budget.global || '';
   (document.getElementById('transportBudget') as HTMLInputElement).value = budget.transport || '';
   (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
   (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
@@ -137,7 +136,6 @@ async function displayBudgetChart() {
 // Gestion des événements
 document.getElementById('saveBudgets')?.addEventListener('click', async () => {
   const budgets = {
-    global: Number((document.getElementById('globalBudget') as HTMLInputElement).value) || 0,
     transport: Number((document.getElementById('transportBudget') as HTMLInputElement).value) || 0,
     leisure: Number((document.getElementById('leisureBudget') as HTMLInputElement).value) || 0,
     health: Number((document.getElementById('healthBudget') as HTMLInputElement).value) || 0,
