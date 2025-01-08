@@ -1,144 +1,113 @@
+// Interface utilisateur
+interface User {
+  id: string; // Clé primaire
+  username: string;
+  email: string;
+  password: string;
+  profileImage?: string; // Facultatif
+}
+
+// Initialise IndexedDB
 function initDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 3); // Version 2
+    const request = indexedDB.open('UserDatabase', 7); // Version 7 avec `id` comme clé primaire
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      if (!db.objectStoreNames.contains('users')) {
+        db.createObjectStore('users', { keyPath: 'id' });
+      }
+    };
 
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 }
 
+// Vérifie les identifiants utilisateur (email et mot de passe)
 async function verifyUser(email: string, password: string): Promise<User | null> {
   const db = await initDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction('users', 'readonly');
     const store = transaction.objectStore('users');
-    const request = store.get(email);
+    const request = store.getAll(); // Récupère tous les utilisateurs
 
     request.onsuccess = () => {
-      const user = request.result as User;
-      if (user && user.password === password) {
-        resolve(user); // Retourne l'objet utilisateur complet si valide
+      const users = request.result as User[];
+      const user = users.find((u) => u.email === email && u.password === password);
+      if (user) {
+        resolve(user);
       } else {
-        resolve(null); // Mot de passe incorrect ou utilisateur non trouvé
+        resolve(null); // Aucun utilisateur correspondant trouvé
       }
     };
+
     request.onerror = () => reject(null);
   });
 }
 
-// Écouteur du formulaire de connexion
+// Gestion de la connexion
 document.getElementById('loginForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
-  const email = (document.getElementById('email') as HTMLInputElement).value;
-  const password = (document.getElementById('password') as HTMLInputElement).value;
+  const email = (document.getElementById('email') as HTMLInputElement).value.trim();
+  const password = (document.getElementById('password') as HTMLInputElement).value.trim();
 
   try {
-    const user = await verifyUser(email, password); // Vérifie les identifiants
+    const user = await verifyUser(email, password);
     if (user) {
       // Stocke l'ID utilisateur dans le Local Storage
       localStorage.setItem('idUser', user.id);
       localStorage.setItem('userName', user.username);
 
-      alert("Connexion réussie !");
-      window.location.href = "about.html"; // Redirige vers la page About
+      alert('Connexion réussie !');
+      window.location.href = 'about.html'; // Redirection vers une page
     } else {
-      alert("Email ou mot de passe incorrect.");
+      alert('Email ou mot de passe incorrect.');
     }
   } catch (error) {
-    console.error("Erreur lors de la connexion :", error);
-    alert("Une erreur est survenue. Veuillez réessayer.");
+    console.error('Erreur lors de la connexion :', error);
+    alert('Une erreur est survenue. Veuillez réessayer.');
   }
 });
 
-// Interface utilisateur pour le typage
-interface User {
-  id: string;
-  username: string;
-  email: string;
-  password: string;
-  profileImage?:string;
-}
+// Gestionnaire d'inscription
+document.getElementById('registerForm')?.addEventListener('submit', async (event) => {
+  event.preventDefault();
 
+  const username = (document.getElementById('username') as HTMLInputElement).value.trim();
+  const email = (document.getElementById('email') as HTMLInputElement).value.trim();
+  const password = (document.getElementById('password') as HTMLInputElement).value.trim();
+  const confirmPassword = (document.getElementById('confirmPassword') as HTMLInputElement).value.trim();
 
-async function handleCredentialResponsea(response: any) {
-  console.log("Encoded JWT ID token: " + response.credential);
-
-  // Decode the JWT to extract user information (e.g., email, name)
-  const userToken = response.credential;
-  const base64Url = userToken.split('.')[1];
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const decodedData = JSON.parse(atob(base64));
-
-  const usera: User = {
-    id: crypto.randomUUID(),
-    username: decodedData.name,
-    email: decodedData.email,
-    password: '', // Pas besoin de mot de passe pour les connexions via Gmail
-    profileImage: decodedData.picture, // Utiliser l'image de profil Google
-  };
-
-  try {
-    const user = await verifyUser(usera?.email, usera?.password); // Vérifie les identifiants
-    if (user) {
-      // Stocke l'ID utilisateur dans le Local Storage
-      localStorage.setItem('idUser', usera.id);
-      localStorage.setItem('userName', usera.username);
-
-      alert("Connexion réussie !");
-      window.location.href = "about.html"; // Redirige vers la page About
-    } else {
-      alert("Email ou mot de passe incorrect.");
-    }
-  } catch (error) {
-    console.error("Erreur lors de la connexion :", error);
-    alert("Une erreur est survenue. Veuillez réessayer.");
+  // Vérification des mots de passe
+  if (password !== confirmPassword) {
+    const errorElement = document.getElementById('passwordError') as HTMLElement;
+    errorElement.classList.remove('hidden');
+    return;
   }
 
-  console.log("User info:", decodedData);
+  const userId = crypto.randomUUID();
+  const user: User = { id: userId, username, email, password };
 
-  // Use this information (e.g., save it in IndexedDB or start a session)
-  
-}
+  try {
+    const db = await initDB();
+    const transaction = db.transaction('users', 'readwrite');
+    const store = transaction.objectStore('users');
 
-// Ensure this function is available globally for the Google API to call
-(window as any).handleCredentialResponsea = handleCredentialResponsea;
+    const request = store.add(user);
 
-declare const FB: any; // Declare FB if TypeScript complains
+    request.onsuccess = () => {
+      alert('Utilisateur inscrit avec succès !');
+      window.location.href = 'login.html'; // Redirection vers la page de connexion
+    };
 
-function facebookLogina() {
-  console.log('aaaaa');
-  FB.login((response: any) => {
-    if (response.authResponse) {
-      console.log('Welcome! Fetching your information...');
-
-      FB.api('/me', { fields: 'id,name,email,picture' }, async (userInfo: any) => {
-        console.log('User info:', userInfo);
-
-        // Example of processing user info
-        const user = {
-          id: userInfo.id,
-          username: userInfo.name,
-          email: userInfo.email,
-          profileImage: userInfo.picture.data.url,
-        };
-
-        console.log('Logged in user:', user);
-
-        // Optional: Save user info to your database or localStorage
-        localStorage.setItem('idUser', user.id);
-        localStorage.setItem('userName', user.username);
-        alert('Connexion réussie avec Facebook !');
-
-        // Redirect to another page
-        window.location.href = 'about.html';
-      });
-    } else {
-      console.error('User cancelled login or did not fully authorize.');
-      alert('Connexion Facebook échouée.');
-    }
-  }, { scope: 'public_profile,email' }); // Request these permissions
-}
-
-// Ensure the function is globally accessible
-(window as any).facebookLogina = facebookLogina;
+    request.onerror = () => {
+      alert('Erreur lors de l\'inscription. Cet email existe peut-être déjà.');
+    };
+  } catch (error) {
+    console.error('Erreur lors de l\'inscription :', error);
+    alert('Une erreur est survenue. Veuillez réessayer.');
+  }
+});

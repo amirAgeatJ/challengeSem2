@@ -22,7 +22,7 @@ function initTransactionDB(): Promise<IDBDatabase> {
 // Initialise IndexedDB pour UserDatabase
 function initUserDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open("UserDatabase", 6);
+    const request = indexedDB.open("UserDatabase", 7);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;

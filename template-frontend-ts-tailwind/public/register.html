@@ -22,20 +22,20 @@
       <label for="password" class="block text-gray-700">Mot de passe</label>
       <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
     </div>
-
     <div class="mb-4">
-      <label class="block text-gray-700">Photo de profil</label>
-      <video id="camera" class="w-full mb-2 rounded" autoplay></video>
-      <canvas id="canvas" class="hidden"></canvas>
-      <input type="hidden" id="profileImage">
-      <button type="button" id="captureButton" class="bg-blue-500 text-white p-2 rounded mb-2">Prendre une photo</button>
-      <div id="dropZone" class="border-2 border-dashed p-4 text-center text-gray-500 rounded">
-        Glissez et déposez une image ici
-      </div>
-      <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto mt-2" src="" alt="Aperçu de la photo">
+      <label for="confirmPassword" class="block text-gray-700">Confirmer le mot de passe</label>
+      <input type="password" id="confirmPassword" class="w-full p-2 border border-gray-300 rounded">
     </div>
-
+    <p id="passwordError" class="text-red-500 text-sm hidden">Les mots de passe ne correspondent pas.</p>
     <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
+
+    <div class="mb-4 flex items-center">
+      <input type="checkbox" id="termsCheckbox" class="mr-2">
+      <label for="termsCheckbox" class="text-gray-700 text-sm">
+        En cochant cette case, j'accepte les
+        <a href="#" class="text-blue-500">termes et conditions</a>.
+      </label>
+    </div>
   </form>
 </div>
 <script src="../dist/register.js"></script>
