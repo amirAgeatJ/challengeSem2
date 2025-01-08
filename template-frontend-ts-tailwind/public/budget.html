@@ -7,60 +7,67 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-
-<!--Display the side bar-->
+<body>
+<!-- Sidebar -->
 <div class="sidebar-container">
   <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
 </div>
-<!--Display the top bar-->
+
+<!-- Topbar -->
 <div class="topbar-container">
   <iframe src="topbar.html" class="topbar-iframe" frameborder="0"></iframe>
 </div>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen main-content">
-  <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold">Budgets</h2>
-    <a href="about.html" class="text-blue-500 hover:underline flex items-center">
-      Retour à la page About <span class="ml-2">→</span>
+
+<!-- Main Content -->
+<div class="main-content">
+  <!-- Title Section -->
+  <div class="page-header">
+    <h2>Budgets</h2>
+    <a href="about.html" class="back-link">
+      Retour à la page About →
     </a>
   </div>
 
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-    <!-- Budget Inputs -->
-
-    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
-      <span class="text-purple-500 text-lg font-bold mb-2">Transport</span>
-      <input id="transportBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+  <!-- Budget Inputs -->
+  <div class="budget-grid">
+    <div class="budget-card">
+      <span class="budget-title">Transport</span>
+      <input id="transportBudget" type="number" class="budget-input" placeholder="Entrez un montant">
     </div>
-    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
-      <span class="text-blue-500 text-lg font-bold mb-2">Loisir</span>
-      <input id="leisureBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+    <div class="budget-card">
+      <span class="budget-title">Loisir</span>
+      <input id="leisureBudget" type="number" class="budget-input" placeholder="Entrez un montant">
     </div>
-    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
-      <span class="text-blue-700 text-lg font-bold mb-2">Santé</span>
-      <input id="healthBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+    <div class="budget-card">
+      <span class="budget-title">Santé</span>
+      <input id="healthBudget" type="number" class="budget-input" placeholder="Entrez un montant">
     </div>
-    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
-      <span class="text-pink-500 text-lg font-bold mb-2">Logement</span>
-      <input id="housingBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+    <div class="budget-card">
+      <span class="budget-title">Logement</span>
+      <input id="housingBudget" type="number" class="budget-input" placeholder="Entrez un montant">
     </div>
-    <div class="p-4 bg-gray-50 border rounded shadow flex flex-col items-center">
-      <span class="text-pink-500 text-lg font-bold mb-2">Education</span>
-      <input id="educationBudget" type="number" class="w-full p-2 border rounded text-center" placeholder="Entrez un montant">
+    <div class="budget-card">
+      <span class="budget-title">Education</span>
+      <input id="educationBudget" type="number" class="budget-input" placeholder="Entrez un montant">
+    </div>
+    <div class="budget-card">
+      <span class="budget-title">Alimentaire</span>
+      <input id="alimentaireBudget" type="number" class="budget-input" placeholder="Entrez un montant">
     </div>
   </div>
 
-  <div class="mt-6 flex justify-end">
-    <button id="saveBudgets" class="bg-blue-500 text-white p-2 rounded">Enregistrer les Budgets</button>
+  <!-- Save Button -->
+  <div class="save-button-container">
+    <button id="saveBudgets" class="save-button">Enregistrer les Budgets</button>
+  </div>
+
+  <!-- Chart -->
+  <div class="chart-container">
+    <h2 class="chart-title">Répartition des Budgets</h2>
+    <canvas id="budgetChart"></canvas>
   </div>
 </div>
 
-  <div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
-    <h2 class="text-xl font-bold mb-4 text-center">Répartition des Budgets</h2>
-    <canvas id="budgetChart"></canvas>
-  </div>
-
 <script src="../dist/budget.js"></script>
-</body>
 </body>
 </html>

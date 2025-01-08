@@ -1,0 +1,146 @@
+/* Global Styles */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f5fa;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar-container {
+  width: 250px;
+  height: 100vh;
+  background-color: #fff;
+  border-right: 1px solid #e6e6e6;
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+.sidebar-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Topbar */
+.topbar-container {
+  width: calc(100% - 250px);
+  height: 70px;
+  position: fixed;
+  top: 0;
+  left: 250px;
+  background-color: #fff;
+  border-bottom: 1px solid #e6e6e6;
+}
+
+.topbar-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/* Main Content */
+.main-content {
+  margin-left: 250px;
+  margin-top: 70px;
+  padding: 20px;
+  width: calc(100% - 250px);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Page Header */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-header h2 {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.back-link {
+  font-size: 1rem;
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.back-link:hover {
+  color: #0056b3;
+}
+
+/* Budget Grid */
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.budget-card {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.budget-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.budget-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Save Button */
+.save-button-container {
+  text-align: right;
+}
+
+.save-button {
+  background-color: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #0056b3;
+}
+
+/* Chart */
+.chart-container {
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.chart-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #555;
+}

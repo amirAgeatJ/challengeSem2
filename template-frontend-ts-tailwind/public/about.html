@@ -4,59 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Page About - Convertisseur de Devises</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Inclut Chart.js depuis le CDN -->
+    <link rel="stylesheet" href="about.css">
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css"
+        rel="stylesheet"
+    >
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<!--Display the side bar-->
+<body>
+<!-- Conteneur de la Sidebar -->
 <div class="sidebar-container">
     <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
 </div>
-<!--Display the top bar-->
-<div class="topbar-container">
-    <iframe src="topbar.html" class="topbar-iframe" frameborder="0"></iframe>
-</div>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen main-content">
-<!-- Section Budget -->
-<div id="totalBudgetCard" class="w-full max-w-md p-6 bg-white shadow-lg rounded mt-4">
-    <h2 class="text-xl font-bold text-center mb-4">Budget Total</h2>
-    <p id="totalBudget" class="text-3xl font-semibold text-center text-gray-700">0 €</p>
-</div>
 
-<!-- Graphique Budget -->
+<!-- Contenu principal -->
+<div class="main-content">
+    <!-- Barre supérieure -->
+    <div class="top-bar">
+        <button id="toggleCurrencyButton" class="currency-converter-btn">
+            Convertir en USD
+        </button>
+        <div class="user-profile">
+            <img id="userProfileImage" src="assets/img/default-profile.png" alt="Profile" class="profile-image">
+        </div>
+    </div>
 
+    <!-- Carte du budget total -->
+    <div id="totalBudgetCard" class="card">
+        <h2>Budget Total</h2>
+        <p id="totalBudget" class="budget-value">0 €</p>
+        <div class="clipboard-container">
+            <!-- Icône de presse-papiers -->
+            <i id="copyBudgetButton" class="bi bi-clipboard" style="cursor: pointer; font-size: 1.5rem;" title="Copier le budget"></i>
+            <button class="add-funds-btn">+ Ajouter des fonds</button>
+        </div>
+    </div>
 
-<!-- Section Transactions -->
-<div class="w-full max-w-md p-4 mt-6 bg-white shadow-lg rounded">
-    <h2 class="text-xl font-bold mb-4 text-center">Transactions</h2>
-    <div id="transactionList" class="space-y-4">
-        <!-- Transactions seront affichées ici -->
+    <!-- Section des revenus et dépenses -->
+    <div id="summaryCard" class="summary">
+        <div>
+            <h3>Revenus</h3>
+            <p id="totalIncome">0 €</p>
+        </div>
+        <div>
+            <h3>Dépenses</h3>
+            <p id="totalExpenses">0 €</p>
+        </div>
+    </div>
+
+    <!-- Section des transactions -->
+    <div class="transaction-container">
+        <h2>Historique des Transactions</h2>
+        <div id="transactionList">
+            <!-- Transactions générées par le script -->
+        </div>
     </div>
 </div>
-
-
-<div class="fixed top-4 right-4">
-    <button id="fullscreenButton" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded">
-        Plein Écran
-    </button>
-</div>
-
-<div>
-    <button id="toggleCurrencyButton" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-        Convertir en USD
-    </button>
-</div>
-
-
-
-<!-- Carte Somme des Dépenses et Revenus -->
-<div id="summaryCard" class="fixed top-4 left-4 bg-white shadow-lg rounded p-4 w-64">
-    <h3 class="text-lg font-bold mb-2">Résumé</h3>
-    <p><strong>Total Dépenses :</strong> <span id="totalExpenses">0</span> </p>
-    <p><strong>Total Revenus :</strong> <span id="totalIncome">0</span> </p>
-</div>
-
-
 <script src="../dist/about.js"></script>
 </body>
 </html>

@@ -92,7 +92,7 @@ async function addTransaction(transaction: Transaction): Promise<void> {
   });
 }
 
-// Fonction pour afficher une notification
+// Fonction pour afficher une notification et vibrer
 function showNotification(title: string, body: string) {
   if (!("Notification" in window)) {
     alert("Les notifications ne sont pas prises en charge par votre navigateur.");
@@ -101,8 +101,12 @@ function showNotification(title: string, body: string) {
 
   Notification.requestPermission().then((permission) => {
     if (permission === "granted") {
-
       new Notification(title, { body });
+
+      // Ajout de la vibration (durée personnalisée en millisecondes)
+      if (navigator.vibrate) {
+        navigator.vibrate([200, 100, 200]); // Vibre 200ms, pause 100ms, vibre 200ms
+      }
     } else if (permission === "denied") {
       alert("Vous avez refusé les notifications. Activez-les dans les paramètres du navigateur.");
     }
@@ -159,6 +163,12 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
     await addTransaction(transaction);
     await updateBudgets(userId, type, category, amount);
     showNotification("Transaction ajoutée", `Votre transaction de ${amount} € a été ajoutée avec succès.`);
+
+    // Ajout de vibration après une transaction réussie
+    if (navigator.vibrate) {
+      navigator.vibrate([300]); // Vibre 300ms
+    }
+
     alert("Transaction ajoutée avec succès !");
     window.location.href = "about.html";
   } catch (error) {

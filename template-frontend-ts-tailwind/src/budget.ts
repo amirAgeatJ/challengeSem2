@@ -27,6 +27,7 @@ async function saveBudget(budgetData: {
   leisure: number;
   health: number;
   housing: number;
+  alimentaire: number;
   education: number;
 }) {
   const userId = localStorage.getItem('idUser');
@@ -85,6 +86,7 @@ async function displayBudget() {
   (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
   (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
   (document.getElementById('housingBudget') as HTMLInputElement).value = budget.housing || '';
+  (document.getElementById('alimentaireBudget') as HTMLInputElement).value = budget.housing || '';
   (document.getElementById('educationBudget') as HTMLInputElement).value = budget.education || '';
 }
 
@@ -96,8 +98,8 @@ async function displayBudgetChart() {
     return;
   }
 
-  const categories = ['transport', 'leisure', 'health', 'housing', 'education'];
-  const labels = ['Transport', 'Loisir', 'Santé', 'Logement', 'Éducation'];
+  const categories = ['transport', 'leisure', 'health', 'housing', 'alimentaire', 'education'];
+  const labels = ['Transport', 'Loisir', 'Santé', 'Logement', 'Alimentaire', 'Éducation'];
   const data = categories.map((cat) => budget[cat] || 0);
 
   const canvas = document.getElementById('budgetChart') as HTMLCanvasElement;
@@ -140,6 +142,7 @@ document.getElementById('saveBudgets')?.addEventListener('click', async () => {
     leisure: Number((document.getElementById('leisureBudget') as HTMLInputElement).value) || 0,
     health: Number((document.getElementById('healthBudget') as HTMLInputElement).value) || 0,
     housing: Number((document.getElementById('housingBudget') as HTMLInputElement).value) || 0,
+    alimentaire: Number((document.getElementById('alimentaireBudget') as HTMLInputElement).value) || 0,
     education: Number((document.getElementById('educationBudget') as HTMLInputElement).value) || 0,
   };
 

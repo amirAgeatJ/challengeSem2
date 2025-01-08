@@ -1,42 +1,49 @@
-// Fonction pour récupérer le nom d'utilisateur depuis la session
-function getUsernameFromSession(): string | null {
-    // Exemple : Vous récupérez la session via `localStorage`, `sessionStorage` ou une API
-    return localStorage.getItem('userName'); // Remplacez par la méthode appropriée à votre application
-}
+/**
+ * Affiche l'image du profil utilisateur
+ */
+async function displayUserProfile() {
+    const userId = localStorage.getItem('idUser');
+    if (!userId) {
+        console.error('Utilisateur non connecté.');
+        return;
+    }
 
-// Fonction pour afficher le nom d'utilisateur à côté de l'icône de profil
-function displayUsername(): void {
-    const usernameDisplay = document.getElementById('username-display');
-    if (!usernameDisplay) return;
+    const user = await getUserById(userId); // Suppose que cette fonction existe dans about.js
+    const userProfileImage = document.getElementById('userProfileImage');
 
-    const username = getUsernameFromSession();
-    if (username) {
-        usernameDisplay.textContent = username; // Affiche le nom de l'utilisateur
+    if (user && user.profileImage) {
+        userProfileImage.src = user.profileImage;
     } else {
-        usernameDisplay.textContent = ''; // Aucun nom à afficher
+        userProfileImage.src = 'assets/img/default-profile.png'; // Image par défaut
     }
 }
 
-// Appeler la fonction au chargement de la page
-window.addEventListener('DOMContentLoaded', () => {
-    displayUsername();
+/**
+ * Gère la conversion de devise
+ */
+function handleCurrencyToggle() {
+    const toggleCurrencyButton = document.getElementById('toggleCurrencyButton');
+    if (toggleCurrencyButton) {
+        toggleCurrencyButton.addEventListener('click', async () => {
+            if (currentCurrency === 'EUR') {
+                currentCurrency = 'USD';
+                toggleCurrencyButton.textContent = 'Convertir en EUR';
+            } else {
+                currentCurrency = 'EUR';
+                toggleCurrencyButton.textContent = 'Convertir en USD';
+            }
+
+            // Met à jour les données affichées
+            await displayTotalBudget(); // Suppose que cette fonction existe dans about.js
+            await displayUserBudget();
+            await displayTransactions();
+            await displayTransactionSummary();
+        });
+    }
+}
+
+// Initialisation
+document.addEventListener('DOMContentLoaded', () => {
+    displayUserProfile();
+    handleCurrencyToggle();
 });
-
-function waitFor(ms:number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-
- /* document.addEventListener('DOMContentLoaded', async () => {
-    const fullScreenButton = document.getElementById('fullscreenButton');
-    fullScreenButton?.addEventListener('click', toggleFullScreen);
-  });
-  
-  function toggleFullScreen() {
-    if (!document.fullscreenElement) {
-      // Request fullscreen on the document element (or body)
-      document.documentElement.requestFullscreen(); // Makes the entire document fullscreen
-    } else {
-      document.exitFullscreen(); // Exits fullscreen when pressed again
-    }
-  }*/

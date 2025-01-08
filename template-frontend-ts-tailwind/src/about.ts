@@ -63,6 +63,23 @@ async function getUserBudget(userId: string): Promise<any | null> {
   });
 }
 
+async function displayUserProfile() {
+    const userId = localStorage.getItem('idUser');
+    if (!userId) {
+        console.error('Utilisateur non connecté.');
+        return;
+    }
+
+    const user = await getUserById(userId);
+    const userProfileImage = document.getElementById('userProfileImage') as HTMLImageElement;
+
+    if (user && user.profileImage) {
+        userProfileImage.src = user.profileImage;
+    } else {
+        userProfileImage.src = 'assets/img/default-profile.png'; // Image par défaut
+    }
+}
+
 async function getTransactionsForUser(userId: string): Promise<any[]> {
   const db = await initTransactionDB();
   return new Promise((resolve, reject) => {
@@ -140,6 +157,7 @@ async function displayUserBudget() {
   `;
 }
 
+
 async function displayTotalBudget() {
     const userId = localStorage.getItem('idUser');
     if (!userId) {
@@ -205,6 +223,31 @@ async function displayTransactionSummary() {
 
     totalExpensesElement.textContent = (totalExpenses * factor).toFixed(2) + ' ' + symbol;
     totalIncomeElement.textContent = (totalIncome * factor).toFixed(2) + ' ' + symbol;
+  }
+}
+
+function copyTotalBudgetToClipboard() {
+  const totalBudgetElement = document.getElementById('totalBudget');
+  if (!totalBudgetElement) {
+    alert("Impossible de copier : le budget total est introuvable.");
+    return;
+  }
+
+  const totalBudgetText = totalBudgetElement.textContent || "0 €";
+
+  // Vérifie si la Web API Clipboard est disponible
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(totalBudgetText).then(
+      () => {
+        alert(`Budget total copié : ${totalBudgetText}`);
+      },
+      (err) => {
+        console.error("Erreur lors de la copie dans le presse-papiers :", err);
+        alert("Une erreur s'est produite lors de la copie dans le presse-papiers.");
+      }
+    );
+  } else {
+    alert("La fonctionnalité de copie n'est pas disponible sur votre navigateur.");
   }
 }
 
@@ -278,6 +321,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await displayUserBudget();
     await displayTransactions();
     await displayTransactionSummary();
+    await displayUserProfile(); // Affiche l'image du profil utilisateur
+
 
     // 3) Gère le bouton de conversion (basculer EUR <-> USD)
     const toggleCurrencyButton = document.getElementById('toggleCurrencyButton');
@@ -298,6 +343,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         await displayTransactionSummary();
       });
     }
+
+ const copyBudgetButton = document.getElementById('copyBudgetButton');
+  if (copyBudgetButton) {
+    copyBudgetButton.addEventListener('click', copyTotalBudgetToClipboard);
+  }
 
     // 4) Gère le bouton plein écran
     const fullscreenButton = document.getElementById('fullscreenButton');

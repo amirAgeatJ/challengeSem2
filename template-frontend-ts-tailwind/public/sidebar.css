@@ -1,0 +1,82 @@
+/* Style global de la sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 250px;
+  height: 100%;
+  background-color: #ffffff; /* Couleur blanche pour un design épuré */
+  border-right: 1px solid #e5e5e5; /* Ligne de séparation */
+  padding: 20px 15px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Légère ombre */
+}
+
+/* Logo et titre */
+.sidebar-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.sidebar-logo {
+  width: 80px;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333333; /* Gris foncé pour le texte */
+}
+
+/* Liste des menus */
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.sidebar-menu li {
+  margin-bottom: 15px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555555;
+  padding: 10px 15px;
+  border-radius: 8px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.sidebar-link i {
+  font-size: 1.2rem;
+  margin-right: 10px;
+}
+
+/* Style pour le lien actif */
+.sidebar-link.active,
+.sidebar-link:hover {
+  background-color: #f0f4ff; /* Couleur bleu clair */
+  color: #4a6cf7; /* Bleu pour l'icône et le texte */
+}
+
+/* Alignement en bas pour le menu complémentaire */
+.sidebar-footer {
+  margin-top: auto;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #888888;
+}
+
+.sidebar-footer a {
+  text-decoration: none;
+  color: #4a6cf7;
+  font-weight: 500;
+}

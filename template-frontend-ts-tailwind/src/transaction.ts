@@ -88,15 +88,16 @@ async function deleteTransaction(
   });
 }
 
+// Récupère le budget pour un utilisateur
 async function getUserBudget(userId: string): Promise<any | null> {
   const db = await initTransactionDB();
   return new Promise((resolve, reject) => {
-    const transaction = db.transaction('budgets', 'readonly');
-    const store = transaction.objectStore('budgets');
+    const transaction = db.transaction("budgets", "readonly");
+    const store = transaction.objectStore("budgets");
     const request = store.get(userId);
 
     request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject('Erreur lors de la récupération du budget.');
+    request.onerror = () => reject("Erreur lors de la récupération du budget.");
   });
 }
 
@@ -116,8 +117,6 @@ async function updateBudgetAfterDeletion(
   }
 
   const updatedBudget = { ...existingBudget };
-  // Pour un income supprimé, on retranche le montant => c'est un ajustement négatif
-  // Pour une expense supprimée, on ajoute le montant => ajustement positif
   const adjustment = type === "income" ? -amount : amount;
 
   updatedBudget.global += adjustment;
@@ -133,7 +132,22 @@ async function updateBudgetAfterDeletion(
   });
 }
 
-// Affiche les transactions avec un bouton Supprimer
+// Retourne une icône pour une catégorie donnée
+function getCategoryIcon(category: string): string {
+  const iconsMap: { [key: string]: string } = {
+    food: '<i class="bi bi-utensils"></i>',
+    education: '<i class="bi bi-book"></i>',
+    transport: '<i class="bi bi-bus-front"></i>',
+    leisure: '<i class="bi bi-controller"></i>',
+    health: '<i class="bi bi-heart-pulse"></i>',
+    housing: '<i class="bi bi-house-door"></i>',
+    default: '<i class="bi bi-question-circle"></i>',
+  };
+
+  return iconsMap[category] || iconsMap["default"];
+}
+
+// Affiche les transactions avec des icônes et un bouton Supprimer
 async function displayTransactions() {
   const userId = localStorage.getItem("idUser");
   if (!userId) {
@@ -151,52 +165,33 @@ async function displayTransactions() {
     return;
   }
 
-  const enhancedTransactions = await Promise.all(
-    transactions.map(async (transaction) => {
-      const user = await getUserById(transaction.userId);
-      return {
-        ...transaction,
-        username: user?.username || "Utilisateur inconnu",
-        userPhoto: user?.profileImage || "",
-      };
-    })
-  );
+  transactionList.innerHTML = transactions
+    .map((transaction) => {
+      const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
+      const categoryIcon = getCategoryIcon(transaction.category);
 
-  // Remplacement des types "expense" et "income" par leurs traductions
-  transactionList.innerHTML = enhancedTransactions
-    .map(
-      (transaction) => {
-        const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense"; // Traduction
-        return `
-          <div class="flex items-center gap-4 p-4 border border-gray-300 rounded">
-            <img
-              src="${transaction.userPhoto}"
-              alt="Photo utilisateur"
-              class="w-10 h-10 rounded-full"
-            />
-            <span class="font-semibold">${transaction.username}</span>
-            <span>${typeLabel}</span> <!-- Type traduit -->
-            <span>${transaction.category}</span>
-            <span>${transaction.amount.toFixed(2)} €</span>
-            <span>${new Date(transaction.date).toLocaleDateString()}</span>
-
-            <!-- Bouton Supprimer -->
-            <button
-              class="delete-button bg-red-500 text-white p-2 rounded ml-auto"
-              data-id="${transaction.id}"
-              data-type="${transaction.type}"
-              data-category="${transaction.category}"
-              data-amount="${transaction.amount}"
-            >
-              Supprimer
-            </button>
+      return `
+        <div class="transaction-item">
+          <div class="category-icon">${categoryIcon}</div>
+          <div class="transaction-details">
+            <p>${transaction.category}</p>
+            <p>${transaction.amount.toFixed(2)} €</p>
+            <p>${new Date(transaction.date).toLocaleDateString()}</p>
           </div>
-        `;
-      }
-    )
+          <button
+            class="delete-button"
+            data-id="${transaction.id}"
+            data-type="${transaction.type}"
+            data-category="${transaction.category}"
+            data-amount="${transaction.amount}"
+          >
+            Supprimer
+          </button>
+        </div>
+      `;
+    })
     .join("");
 
-  // Ajoute des gestionnaires d'événements pour les boutons Supprimer
   document.querySelectorAll(".delete-button").forEach((button) => {
     button.addEventListener("click", async (event) => {
       const target = event.target as HTMLButtonElement;
@@ -210,11 +205,10 @@ async function displayTransactions() {
           try {
             await deleteTransaction(transactionId, userId, type, category, amount);
             alert("Transaction supprimée avec succès.");
-            // Recharge les transactions après suppression
             await displayTransactions();
           } catch (error) {
             console.error("Erreur lors de la suppression de la transaction :", error);
-            alert("Une erreur est survenue. Veuillez réessayer.");
+            alert("Une erreur s'est produite. Veuillez réessayer.");
           }
         }
       }
@@ -222,12 +216,30 @@ async function displayTransactions() {
   });
 }
 
+// Affiche l'image de profil de l'utilisateur connecté
+async function displayUserProfile() {
+  const userId = localStorage.getItem("idUser");
+  if (!userId) {
+    console.error("Utilisateur non connecté.");
+    return;
+  }
+
+  const user = await getUserById(userId);
+  const userProfileImage = document.getElementById("userProfileImage") as HTMLImageElement;
+
+  if (user && user.profileImage) {
+    userProfileImage.src = user.profileImage;
+  } else {
+    userProfileImage.src = "assets/img/default-profile.png";
+  }
+}
 
 // Initialisation
 document.addEventListener("DOMContentLoaded", async () => {
   try {
     await displayTransactions();
+    await displayUserProfile();
   } catch (error) {
-    console.error("Erreur lors de l’affichage des données :", error);
+    console.error("Erreur lors de l'affichage des données :", error);
   }
 });
