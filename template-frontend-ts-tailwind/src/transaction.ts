@@ -1,3 +1,14 @@
+interface Transaction {
+  id: number;
+  userId: string;
+  userName: string;
+  userImage?: string;
+  category: string;
+  type: string;
+  amount: number;
+  date: string;
+}
+
 // Initialise IndexedDB pour TransactionDatabase
 function initTransactionDB(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -38,7 +49,7 @@ function initUserDB(): Promise<IDBDatabase> {
 }
 
 // Récupère les transactions pour un utilisateur
-async function getTransactionsForUser(userId: string): Promise<any[]> {
+async function getTransactionsForUser(userId: string): Promise<Transaction[]> {
   const db = await initTransactionDB();
   return new Promise((resolve, reject) => {
     const transaction = db.transaction("transactions", "readonly");
@@ -46,7 +57,7 @@ async function getTransactionsForUser(userId: string): Promise<any[]> {
     const request = store.getAll();
 
     request.onsuccess = () =>
-      resolve((request.result || []).filter((t: any) => t.userId === userId));
+      resolve((request.result || []).filter((t: Transaction) => t.userId === userId));
     request.onerror = () => reject("Erreur lors de la récupération des transactions.");
   });
 }
@@ -161,19 +172,25 @@ async function displayTransactions() {
   if (!transactionList) return;
 
   if (transactions.length === 0) {
-    transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
+    transactionList.innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-info-circle" style="font-size: 2rem; color: #7662EA;"></i>
+        <p>Votre historique est vide. Effectuez votre première transaction.</p>
+      </div>
+    `;
     return;
   }
 
   transactionList.innerHTML = transactions
     .map((transaction) => {
-      const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
       const categoryIcon = getCategoryIcon(transaction.category);
 
       return `
         <div class="transaction-item">
-          <div class="category-icon">${categoryIcon}</div>
+          <img src="${transaction.userImage || 'assets/img/default-profile.png'}" alt="Profile" class="profile-image">
           <div class="transaction-details">
+            <p>${transaction.userName}</p>
+            <div class="category-icon">${categoryIcon}</div>
             <p>${transaction.category}</p>
             <p>${transaction.amount.toFixed(2)} €</p>
             <p>${new Date(transaction.date).toLocaleDateString()}</p>
@@ -194,7 +211,7 @@ async function displayTransactions() {
 
   document.querySelectorAll(".delete-button").forEach((button) => {
     button.addEventListener("click", async (event) => {
-      const target = event.target as HTMLButtonElement;
+      const target = event.currentTarget as HTMLButtonElement;
       const transactionId = parseInt(target.dataset.id || "", 10);
       const type = target.dataset.type || "";
       const category = target.dataset.category || "";
