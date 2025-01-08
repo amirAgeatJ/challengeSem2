@@ -1,0 +1,193 @@
+body {
+  background-color: #f9fafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  flex-direction: column;
+  font-family: "Poppins", sans-serif;
+  font-weight: 400;
+}
+
+.logo {
+  width: 32px;
+  height: 32px;
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  margin-left: 0.5rem;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.bg-white {
+  background-color: #ffffff;
+}
+
+.shadow-lg {
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+.rounded {
+  border-radius: 8px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-gray-700 {
+  color: #4a5568;
+}
+
+.text-blue-500 {
+  color: #4299e1;
+}
+
+.text-blue-500:hover {
+  color: #2b6cb0;
+}
+
+.border {
+  border-width: 1px;
+}
+
+.border-gray-300 {
+  border-color: #d2d6dc;
+}
+
+.p-2 {
+  padding: 0.5rem;
+}
+
+.p-8 {
+  padding: 2rem;
+}
+
+.m-0 {
+  margin: 0;
+}
+
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.max-w-sm {
+  max-width: 24rem;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-center {
+  justify-content: center;
+}
+
+.space-x-2 > :not(:first-child) {
+  margin-left: 0.5rem;
+}
+
+button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  border-radius: 8px;
+  border: 1px solid #d2d6dc;
+  background-color: #ffffff;
+  color: #4a5568;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  font-weight: 400;
+}
+
+button img {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}
+
+button:hover {
+  background-color: #f0f1f3;
+}
+
+.sign-in-button {
+  background-color: #7662ea;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s;
+  font-weight: 600;
+}
+
+.sign-in-button:hover {
+  background-color: #6856d4;
+}
+.create-account-button {
+  background-color: #7662ea;
+  border-radius: 8px;
+  color: #ffffff;
+  padding: 0.5rem;
+  width: 100%;
+  text-align: center;
+  transition: background-color 0.3s;
+  font-weight: 600;
+}
+
+.create-account-button:hover {
+  background-color: #6856d4; /* Optional: a slightly darker shade for hover effect */
+}
+input {
+  border: 1px solid #e0e3e8; /* Set border color */
+  padding: 0.5rem;
+  border-radius: 8px;
+  width: 100%;
+}
+.field-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.field-container input {
+  width: 175px;
+  height: 24px;
+  border: 1px solid #e0e3e8;
+  padding: 0.5rem;
+  border-radius: 8px;
+  transition: border-color 0.3s; /* Smooth transition for border color */
+}
+
+.field-container input:focus {
+  border-color: #7662ea; /* Change border color on focus */
+  outline: none; /* Remove default outline */
+}

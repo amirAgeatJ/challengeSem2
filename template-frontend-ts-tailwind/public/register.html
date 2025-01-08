@@ -1,43 +1,58 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inscription</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="register.css">
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
-  <h2 class="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
-  <form id="registerForm">
-    <div class="mb-4">
-      <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
-      <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded">
+    <div class="logo-container flex items-center mb-4">
+        <img src="assets/img/logo.png" alt="FundFlow Logo" class="logo">
+        <span class="ml-2 logo-text">FundFlow</span>
     </div>
-    <div class="mb-4">
-      <label for="email" class="block text-gray-700">Email</label>
-      <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded">
+    <div class="w-full max-w-sm p-8 bg-white shadow-lg rounded">
+        <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold">Sign up</h2>
+            <p>Already have an account? <a href="login.html" class="text-blue-500">Sign in here</a></p>
+        </div>
+        <form id="registerForm">
+          <div class="field-container mb-4">
+            <div>
+                <label for="firstName" class="block text-gray-700">First Name</label>
+                <input type="text" id="firstName" class="border rounded">
+            </div>
+            <div>
+                <label for="lastName" class="block text-gray-700">Last Name</label>
+                <input type="text" id="lastName" class="border rounded">
+            </div>
+        </div>
+            <div class="mb-4">
+                <label for="email" class="block text-gray-700">Email</label>
+                <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="password" class="block text-gray-700">Password</label>
+                <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4">
+                <label for="confirmPassword" class="block text-gray-700">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="w-full p-2 border border-gray-300 rounded">
+            </div>
+            <div class="mb-4 flex items-center">
+                <input type="checkbox" id="terms" class="mr-2">
+                <label for="terms" class="text-gray-700 text-sm">
+                    By clicking Create an account, I agree that I have read and accepted the 
+                    <a href="#" class="text-blue-500">Terms of Use</a> and 
+                    <a href="#" class="text-blue-500">Privacy Policy</a>.
+                </label>
+            </div>
+            <button type="submit" class="create-account-button w-full text-white p-2 rounded">Create an account</button>
+                </div>
+            </div>
+        </form>
     </div>
-    <div class="mb-4">
-      <label for="password" class="block text-gray-700">Mot de passe</label>
-      <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
-    </div>
-
-    <div class="mb-4">
-      <label class="block text-gray-700">Photo de profil</label>
-      <video id="camera" class="w-full mb-2 rounded" autoplay></video>
-      <canvas id="canvas" class="hidden"></canvas>
-      <input type="hidden" id="profileImage">
-      <button type="button" id="captureButton" class="bg-blue-500 text-white p-2 rounded mb-2">Prendre une photo</button>
-      <div id="dropZone" class="border-2 border-dashed p-4 text-center text-gray-500 rounded">
-        Glissez et déposez une image ici
-      </div>
-      <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto mt-2" src="" alt="Aperçu de la photo">
-    </div>
-
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
-  </form>
-</div>
-<script src="../dist/register.js"></script>
+    <script src="../dist/register.js"></script>
 </body>
 </html>
