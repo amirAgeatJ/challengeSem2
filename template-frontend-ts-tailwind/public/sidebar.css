@@ -1,4 +1,6 @@
-/* Style global de la sidebar */
+/* ----------------------
+   Sidebar Styling
+---------------------- */
 .sidebar {
   position: fixed;
   top: 0;
@@ -11,6 +13,8 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Légère ombre */
+  transition: all 0.3s ease;
+  z-index: 1000;
 }
 
 /* Logo et titre */
@@ -60,11 +64,22 @@
   margin-right: 10px;
 }
 
+/* Texte des liens */
+.link-text {
+  display: inline;
+  transition: opacity 0.3s;
+}
+
 /* Style pour le lien actif */
 .sidebar-link.active,
 .sidebar-link:hover {
   background-color: #f0f4ff; /* Couleur bleu clair */
   color: #4a6cf7; /* Bleu pour l'icône et le texte */
+}
+
+.sidebar-link.active i,
+.sidebar-link:hover i {
+  color: #4a6cf7;
 }
 
 /* Alignement en bas pour le menu complémentaire */
@@ -79,4 +94,79 @@
   text-decoration: none;
   color: #4a6cf7;
   font-weight: 500;
+}
+
+/* ----------------------
+   Responsive Styles
+---------------------- */
+@media screen and (max-width: 768px) {
+  /* Repositionner la sidebar en bas */
+  .sidebar {
+    position: fixed;
+    bottom: 0;
+    top: auto;
+    left: 0;
+    width: 100%;
+    height: 60px; /* Hauteur réduite pour la barre inférieure */
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 10px;
+    border-right: none;
+    border-top: 1px solid #e5e5e5; /* Ligne de séparation en haut */
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  /* Masquer le header de la sidebar */
+  .sidebar-header {
+    display: none;
+  }
+
+  /* Réorganiser le menu */
+  .sidebar-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    flex-grow: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  .sidebar-menu li {
+    margin: 0;
+  }
+
+  .sidebar-link {
+    flex-direction: column;
+    padding: 5px;
+  }
+
+  .sidebar-link .link-text {
+    display: none; /* Masquer le texte des liens */
+  }
+
+  .sidebar-link i {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  /* Ajouter un effet de survol pour améliorer la visibilité */
+  .sidebar-link:hover {
+    background-color: #e0e0ff;
+  }
+
+  /* Ajuster le contenu principal pour éviter qu'il ne soit caché par la sidebar */
+  .main-content {
+    margin-left: 0;
+    margin-bottom: 60px; /* Espace pour la sidebar en bas */
+    transition: all 0.3s ease;
+  }
+
+  /* Optionnel : Réduire la taille des icônes sur très petits écrans */
+  @media screen and (max-width: 480px) {
+    .sidebar-link i {
+      font-size: 1.3rem;
+    }
+  }
 }

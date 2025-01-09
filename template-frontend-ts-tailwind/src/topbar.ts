@@ -27,10 +27,10 @@ function handleCurrencyToggle() {
         toggleCurrencyButton.addEventListener('click', async () => {
             if (currentCurrency === 'EUR') {
                 currentCurrency = 'USD';
-                toggleCurrencyButton.textContent = 'Convertir en EUR';
+                toggleCurrencyButton.textContent = 'EUR';
             } else {
                 currentCurrency = 'EUR';
-                toggleCurrencyButton.textContent = 'Convertir en USD';
+                toggleCurrencyButton.textContent = 'USD';
             }
 
             // Met à jour les données affichées

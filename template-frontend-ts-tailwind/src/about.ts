@@ -189,6 +189,20 @@ async function displayTotalBudget() {
     totalBudgetElement.textContent = `${(totalBudget * factor).toFixed(2)} ${symbol}`;
 }
 
+// Fonction pour rediriger vers la page Profile
+function redirectToProfile() {
+    window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
+}
+
+// Ajout de l'écouteur d'événement (facultatif si le onclick est directement ajouté en HTML)
+document.addEventListener('DOMContentLoaded', () => {
+    const profileImage = document.getElementById('userProfileImage');
+    if (profileImage) {
+        profileImage.addEventListener('click', redirectToProfile);
+    }
+});
+
+
 /**
  * Affiche la somme des dépenses et des revenus
  */
@@ -225,6 +239,18 @@ async function displayTransactionSummary() {
     totalIncomeElement.textContent = (totalIncome * factor).toFixed(2) + ' ' + symbol;
   }
 }
+
+function redirectToBudget() {
+    window.location.href = 'budget.html'; // Remplacez 'budget.html' par le chemin réel de votre page Budget
+}
+
+// Assurez-vous que la fonction est appelée lorsque le bouton est cliqué
+document.addEventListener('DOMContentLoaded', () => {
+    const addFundsButton = document.querySelector('.add-funds-btn');
+    if (addFundsButton) {
+        addFundsButton.addEventListener('click', redirectToBudget);
+    }
+});
 
 function copyTotalBudgetToClipboard() {
   const totalBudgetElement = document.getElementById('totalBudget');
@@ -330,10 +356,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       toggleCurrencyButton.addEventListener('click', async () => {
         if (currentCurrency === 'EUR') {
           currentCurrency = 'USD';
-          toggleCurrencyButton.textContent = 'Convertir en EUR';
+          toggleCurrencyButton.textContent = 'EUR';
         } else {
           currentCurrency = 'EUR';
-          toggleCurrencyButton.textContent = 'Convertir en USD';
+          toggleCurrencyButton.textContent = 'USD';
         }
 
         // On réaffiche tout après changement de devise
