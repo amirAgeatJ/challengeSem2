@@ -7,26 +7,27 @@
   left: 0;
   width: 250px;
   height: 100%;
-  background-color: #ffffff; /* Couleur blanche pour un design épuré */
-  border-right: 1px solid #e5e5e5; /* Ligne de séparation */
+  background-color: #eceff3; /* Couleur blanche pour un design épuré */
   padding: 20px 15px;
   display: flex;
   flex-direction: column;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Légère ombre */
   transition: all 0.3s ease;
   z-index: 1000;
 }
 
 /* Logo et titre */
 .sidebar-header {
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin-bottom: 30px;
 }
 
 .sidebar-logo {
   width: 80px;
   height: auto;
-  margin-bottom: 10px;
+  margin-bottom: 0; /* Remove the bottom margin */
+  margin-right: 10px; /* Add some space between the logo and the title */
 }
 
 .sidebar-title {
@@ -53,10 +54,12 @@
   text-decoration: none;
   font-size: 1rem;
   font-weight: 500;
-  color: #555555;
+  color: #6b6e75;
   padding: 10px 15px;
   border-radius: 8px;
-  transition: background-color 0.3s, color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
 }
 
 .sidebar-link i {
