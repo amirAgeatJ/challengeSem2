@@ -3,8 +3,8 @@
 ---------------------- */
 body {
   margin: 0;
-  font-family: 'Arial', sans-serif;
-  background-color: #ECEFF3;
+  font-family: "Arial", sans-serif;
+  background-color: #eceff3;
   color: #333;
   transition: margin 0.3s ease;
 }
@@ -23,12 +23,12 @@ body {
   top: 0;
   z-index: 999; /* Assurez-vous que la barre supérieure est au-dessus de la sidebar */
   transition: all 0.3s ease;
-  background-color: #ECEFF3;
+  background-color: #eceff3;
 }
 
 /* Bouton du convertisseur de devise */
 .currency-converter-btn {
-  background-color: #7662EA;
+  background-color: #7662ea;
   color: #ffffff;
   border: none;
   padding: 10px 20px;
@@ -75,7 +75,7 @@ body {
 }
 
 .home-title {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600; /* Semibold */
   font-size: 24px;
   margin: 0; /* Remove default margin */
@@ -83,7 +83,7 @@ body {
 }
 
 .subtitle {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 400; /* Regular */
   font-size: 12px;
   color: #666; /* Adjust the color if needed */
@@ -107,7 +107,7 @@ body {
   margin: 20px 0; /* Add margin for spacing */
   text-align: left; /* Align text to the left */
   margin-left: 20px; /* Align the text with the card */
-  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-family: "Poppins", sans-serif; /* Use Poppins font */
   font-weight: 500; /* Medium weight */
   font-size: 16px; /* Set font size to 20px */
   color: #333; /* Adjust the color if needed */
@@ -115,7 +115,7 @@ body {
 
 .budget-value {
   font-size: 24px;
-  color: #1D1F24;
+  color: #1d1f24;
   margin: 10px 0;
   font-weight: 600;
 }
@@ -152,7 +152,6 @@ body {
   color: #6c5ce7;
 }
 
-
 /* Summary Card for Revenus et Dépenses */
 .cards-container {
   display: flex;
@@ -164,7 +163,7 @@ body {
 .summary-title {
   margin: 20px 0;
 
-  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-family: "Poppins", sans-serif; /* Use Poppins font */
   font-weight: 500; /* Medium weight */
   font-size: 16px; /* Set font size to 20px */
   color: #333;
@@ -199,14 +198,14 @@ body {
 
 #summaryCard .income-section h3,
 #summaryCard .expense-section h3 {
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600; /* Semibold */
-  font-size: 13px; /* Set font size to 13px */
+  font-size: 20px; /* Set font size to 13px */
   margin: 10px 0; /* Consistent margin for spacing */
 }
 
 #summaryCard .income-section h3 {
-  color: #EF746D; /* Color for Revenus */
+  color: #ef746d; /* Color for Revenus */
 }
 
 #summaryCard .expense-section h3 {
@@ -215,7 +214,7 @@ body {
 
 #summaryCard .divider {
   width: 1px;
-  background-color: #E0E3E8; /* Light gray for the divider */
+  background-color: #e0e3e8; /* Light gray for the divider */
   height: 80%; /* Adjust height as needed */
   margin: 0 10px; /* Space around the divider */
 }
@@ -228,10 +227,9 @@ body {
 #totalIncome,
 #totalExpenses {
   font-size: 1.5rem;
-  color: #1D1F24;
+  color: #1d1f24;
   margin: 10px 0;
 }
-
 
 /* ----------------------
    Carroussel Styling
@@ -241,7 +239,7 @@ body {
   margin: 20px 0; /* Add margin for spacing */
   text-align: left; /* Align text to the left */
   margin-left: 40px; /* Align the text with the card */
-  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-family: "Poppins", sans-serif; /* Use Poppins font */
   font-weight: 600; /* Medium weight */
   font-size: 24px; /* Set font size to 20px */
   color: #333; /* Adjust the color if needed */
@@ -266,7 +264,6 @@ body {
   border-radius: 20px;
   width: 1500px;
   height: 134px;
-  
 }
 
 .budget-carousel::-webkit-scrollbar {
@@ -278,7 +275,6 @@ body {
   background-color: #fff;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   text-align: center;
   flex: 0 0 auto;
 }
@@ -301,7 +297,7 @@ body {
 
 /* Carousel Buttons */
 .carousel-button {
-  background-color: #1D1F24;
+  background-color: #1d1f24;
   border: none;
   color: #fff;
   width: 40px; /* Define a fixed width */
@@ -366,7 +362,7 @@ body {
   margin: 20px 0;
   text-align: left;
   margin-left: 40px;
-  font-family: 'Poppins', sans-serif;
+  font-family: "Poppins", sans-serif;
   font-weight: 600;
   font-size: 24px;
   color: #333;
@@ -379,7 +375,7 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   margin-left: 40px;
-  width: 1500px;
+  width: 1480px;
   height: 134px;
 }
 
@@ -455,13 +451,18 @@ body {
   /* Adjust main content margin for smaller screens */
   .main-content {
     margin-left: 0;
-    margin-bottom: 60px;  /* Space for the sidebar at the bottom */
+    margin-bottom: 60px; /* Space for the sidebar at the bottom */
   }
 
   /* Adjust top bar styling */
   .top-bar {
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
+    background-color: rgba(
+      255,
+      255,
+      255,
+      0.8
+    ); /* Semi-transparent background */
   }
 
   /* Adjust summary section for smaller screens */
@@ -472,7 +473,9 @@ body {
   }
 
   /* Adjust card padding for smaller screens */
-  .card, .summary, .transaction-container {
+  .card,
+  .summary,
+  .transaction-container {
     padding: 15px;
   }
 

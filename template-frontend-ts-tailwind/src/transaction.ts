@@ -188,11 +188,11 @@ async function displayTransactions() {
           <span class="transaction-username">${username}</span>
         </div>
         <div class="transaction-details">
-          <p class="transaction-category">
+          <p class="transaction-category" style="margin-right: 200px;">
             <span class="category-icon">${categoryIcon}</span> ${transaction.category}
           </p>
-          <p class="transaction-amount">${transaction.amount.toFixed(2)} €</p>
-          <p class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</p>
+          <p class="transaction-amount" style="margin-right: 200px;">${transaction.amount.toFixed(2)} €</p>
+          <p class="transaction-date" style="margin-right: 200px;">${new Date(transaction.date).toLocaleDateString()}</p>
         </div>
         <button
           class="delete-button"
@@ -200,6 +200,7 @@ async function displayTransactions() {
           data-type="${transaction.type}"
           data-category="${transaction.category}"
           data-amount="${transaction.amount}"
+          style="margin-right: 200px;"
         >
           Supprimer
         </button>
