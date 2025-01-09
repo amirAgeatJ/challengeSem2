@@ -155,65 +155,90 @@ async function displayTransactions() {
     return;
   }
 
-  const transactions = await getTransactionsForUser(userId);
-  const transactionList = document.getElementById("transactionList");
+  try {
+    // Récupérer les transactions et les informations de l'utilisateur en parallèle
+    const [transactions, user] = await Promise.all([
+      getTransactionsForUser(userId),
+      getUserById(userId),
+    ]);
 
-  if (!transactionList) return;
+    const transactionList = document.getElementById("transactionList");
 
-  if (transactions.length === 0) {
-    transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
-    return;
-  }
+    if (!transactionList) return;
 
-  transactionList.innerHTML = transactions
-    .map((transaction) => {
-      const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
-      const categoryIcon = getCategoryIcon(transaction.category);
+    if (transactions.length === 0) {
+      transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
+      return;
+    }
 
-      return `
-        <div class="transaction-item">
-          <div class="category-icon">${categoryIcon}</div>
-          <div class="transaction-details">
-            <p>${transaction.category}</p>
-            <p>${transaction.amount.toFixed(2)} €</p>
-            <p>${new Date(transaction.date).toLocaleDateString()}</p>
+    // Générer le HTML pour chaque transaction
+    transactionList.innerHTML = transactions
+      .map((transaction) => {
+        const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
+        const categoryIcon = getCategoryIcon(transaction.category);
+        const userPhoto = user?.profileImage
+          ? `<img src="${user.profileImage}" alt="Profile" class="transaction-user-photo">`
+          : `<img src="assets/img/default-profile.png" alt="Profile" class="transaction-user-photo">`;
+        const username = user?.username || "Utilisateur";
+
+        return `
+          <div class="transaction-item">
+            <div class="transaction-user-info">
+              ${userPhoto}
+              <span class="transaction-username">${username}</span>
+            </div>
+            <div class="category-icon">${categoryIcon}</div>
+            <div class="transaction-details">
+              <p class="transaction-category">${transaction.category}</p>
+              <p class="transaction-amount">${transaction.amount.toFixed(2)} €</p>
+              <p class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</p>
+            </div>
+            <button
+              class="delete-button"
+              data-id="${transaction.id}"
+              data-type="${transaction.type}"
+              data-category="${transaction.category}"
+              data-amount="${transaction.amount}"
+            >
+              Supprimer
+            </button>
           </div>
-          <button
-            class="delete-button"
-            data-id="${transaction.id}"
-            data-type="${transaction.type}"
-            data-category="${transaction.category}"
-            data-amount="${transaction.amount}"
-          >
-            Supprimer
-          </button>
-        </div>
-      `;
-    })
-    .join("");
+        `;
+      })
+      .join("");
 
-  document.querySelectorAll(".delete-button").forEach((button) => {
-    button.addEventListener("click", async (event) => {
-      const target = event.target as HTMLButtonElement;
-      const transactionId = parseInt(target.dataset.id || "", 10);
-      const type = target.dataset.type || "";
-      const category = target.dataset.category || "";
-      const amount = parseFloat(target.dataset.amount || "0");
+    // Ajouter des écouteurs d'événements aux boutons Supprimer
+    document.querySelectorAll(".delete-button").forEach((button) => {
+      button.addEventListener("click", async (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLButtonElement)) return;
 
-      if (transactionId && userId) {
-        if (confirm("Êtes-vous sûr de vouloir supprimer cette transaction ?")) {
-          try {
-            await deleteTransaction(transactionId, userId, type, category, amount);
-            alert("Transaction supprimée avec succès.");
-            await displayTransactions();
-          } catch (error) {
-            console.error("Erreur lors de la suppression de la transaction :", error);
-            alert("Une erreur s'est produite. Veuillez réessayer.");
+        const transactionId = parseInt(target.dataset.id || "", 10);
+        const type = target.dataset.type || "";
+        const category = target.dataset.category || "";
+        const amount = parseFloat(target.dataset.amount || "0");
+
+        if (transactionId && userId) {
+          if (confirm("Êtes-vous sûr de vouloir supprimer cette transaction ?")) {
+            try {
+              await deleteTransaction(transactionId, userId, type, category, amount);
+              alert("Transaction supprimée avec succès.");
+              await displayTransactions();
+            } catch (error) {
+              console.error("Erreur lors de la suppression de la transaction :", error);
+              alert("Une erreur s'est produite. Veuillez réessayer.");
+            }
           }
         }
-      }
+      });
     });
-  });
+  } catch (error) {
+    console.error("Erreur lors de l'affichage des transactions :", error);
+    const transactionList = document.getElementById("transactionList");
+    if (transactionList) {
+      transactionList.innerHTML = `<p class="text-center text-red-500">Une erreur est survenue lors de l'affichage des transactions.</p>`;
+    }
+  }
 }
 
 // Affiche l'image de profil de l'utilisateur connecté
@@ -232,6 +257,9 @@ async function displayUserProfile() {
   } else {
     userProfileImage.src = "assets/img/default-profile.png";
   }
+}
+function redirectToProfile() {
+  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
 }
 
 // Initialisation

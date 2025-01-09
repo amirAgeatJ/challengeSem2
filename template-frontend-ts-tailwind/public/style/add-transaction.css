@@ -1,0 +1,576 @@
+/* ----------------------
+   Global Styles
+---------------------- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f5fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    min-height: 100vh;
+    transition: margin 0.3s ease;
+  }
+  
+  /* ----------------------
+     Sidebar Styling
+  ---------------------- */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #ffffff; /* Couleur blanche pour un design épuré */
+    border-right: 1px solid #e6e6e6; /* Ligne de séparation */
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Légère ombre */
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .sidebar-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333333; /* Gris foncé pour le texte */
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+  
+  .sidebar-menu li {
+    margin-bottom: 15px;
+  }
+  
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555555;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .sidebar-link i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+  
+  .link-text {
+    display: inline;
+    transition: opacity 0.3s;
+  }
+  
+  .sidebar-link.active,
+  .sidebar-link:hover {
+    background-color: #f0f4ff; /* Couleur bleu clair */
+    color: #4a6cf7; /* Bleu pour l'icône et le texte */
+  }
+  
+  .sidebar-link.active i,
+  .sidebar-link:hover i {
+    color: #4a6cf7;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #888888;
+  }
+  
+  .sidebar-footer a {
+    text-decoration: none;
+    color: #4a6cf7;
+    font-weight: 500;
+  }
+  
+  /* ----------------------
+     Topbar Styling
+  ---------------------- */
+  .topbar-container {
+    position: fixed;
+    top: 0;
+    left: 250px; /* Largeur de la sidebar */
+    width: calc(100% - 250px);
+    height: 70px;
+    background-color: transparent; /* Fond transparent */
+    border-bottom: 1px solid #e6e6e6; /* Ligne de séparation */
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Alignement des éléments au début */
+    gap: 20px; /* Espacement entre les boutons */
+    padding: 0 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 999;
+  }
+  
+  .fullscreen-btn {
+    background-color: #28a745; /* Vert */
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .fullscreen-btn:hover {
+    background-color: #218838;
+  }
+  
+  .fullscreen-btn i {
+    font-size: 1.2rem;
+  }
+  
+  .user-profile {
+    position: relative;
+  }
+  
+  .profile-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    object-fit: cover;
+  }
+  
+  /* ----------------------
+     Main Content Styling
+  ---------------------- */
+  .main-content {
+    margin-left: 250px; /* Largeur de la sidebar */
+    margin-top: 70px; /* Hauteur de la topbar */
+    padding: 20px;
+    width: calc(100% - 250px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Transactions Header */
+  .transactions-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .transactions-title {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  /* Bouton Ajouter une Transaction */
+  .add-transaction-btn {
+    background-color: #6c5ce7; /* Couleur violette */
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .add-transaction-btn:hover {
+    background-color: #5a4cc4;
+  }
+  
+  .add-transaction-btn i {
+    font-size: 1.2rem;
+  }
+  
+  /* Bouton Retour aux Transactions */
+  .back-transaction-btn {
+    background-color: #6c5ce7; /* Couleur violette */
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .back-transaction-btn:hover {
+    background-color: #5a4cc4;
+  }
+  
+  .back-transaction-btn i {
+    font-size: 1.2rem;
+  }
+  
+  /* Transactions List */
+  .transaction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  /* Transaction Item */
+  .transaction-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #e6e6e6;
+    background-color: #fff;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .transaction-item:hover {
+    background-color: #f9f9f9;
+  }
+  
+  /* User Info */
+  .transaction-user-info {
+    display: flex;
+    align-items: center;
+    margin-right: 15px;
+  }
+  
+  .transaction-user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-right: 10px;
+  }
+  
+  .transaction-username {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #333;
+  }
+  
+  /* Category Icon */
+  .category-icon {
+    margin-right: 15px;
+    font-size: 1.5rem;
+    color: #4a6cf7;
+  }
+  
+  /* Transaction Details */
+  .transaction-details {
+    flex-grow: 1;
+  }
+  
+  .transaction-category {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #555;
+  }
+  
+  .transaction-amount {
+    font-size: 1rem;
+    color: #28a745; /* Vert pour les revenus */
+  }
+  
+  .transaction-date {
+    font-size: 0.9rem;
+    color: #888;
+  }
+  
+  /* Delete Button */
+  .delete-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .delete-button:hover {
+    background-color: #c82333;
+  }
+  
+  /* ----------------------
+     Add Transaction Form Styling
+  ---------------------- */
+  .add-transaction-form {
+    max-width: 500px; /* Limite la largeur du formulaire */
+    margin: 0 auto; /* Centre le formulaire */
+  }
+  
+  .add-transaction-form form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  .location-btn {
+    background-color: #4299e1; /* Bleu */
+    color: #fff;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .location-btn:hover {
+    background-color: #3182ce;
+  }
+  
+  /* Submit Button */
+  .submit-btn {
+    background-color: #4299e1; /* Bleu */
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .submit-btn:hover {
+    background-color: #3182ce;
+  }
+  
+  /* Flex Utility Class */
+  .flex {
+    display: flex;
+  }
+  
+  .ml-2 {
+    margin-left: 0.5rem;
+  }
+  
+  /* ----------------------
+     Responsive Styles
+  ---------------------- */
+  @media screen and (max-width: 768px) {
+    /* Repositionner la sidebar en bas */
+    .sidebar {
+      position: fixed;
+      bottom: 0;
+      top: auto;
+      left: 0;
+      width: 100%;
+      height: 60px; /* Hauteur réduite pour la barre inférieure */
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      border-right: none;
+      border-top: 1px solid #e5e5e5; /* Ligne de séparation en haut */
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+  
+    /* Masquer le header de la sidebar */
+    .sidebar-header {
+      display: none;
+    }
+  
+    /* Réorganiser le menu de la sidebar */
+    .sidebar-menu {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      flex-grow: 1;
+      margin: 0;
+      padding: 0;
+    }
+  
+    .sidebar-menu li {
+      margin: 0;
+    }
+  
+    .sidebar-link {
+      flex-direction: column;
+      padding: 5px;
+    }
+  
+    .sidebar-link .link-text {
+      display: none; /* Masquer le texte des liens */
+    }
+  
+    .sidebar-link i {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+  
+    /* Ajuster le contenu principal pour éviter qu'il ne soit caché par la sidebar */
+    .main-content {
+      margin-left: 0;
+      margin-bottom: 60px; /* Espace pour la sidebar en bas */
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+  
+    /* Ajuster la topbar pour qu'elle occupe toute la largeur sur mobile */
+    .topbar-container {
+      left: 0;
+      width: 100%;
+      justify-content: space-between; /* Espacement entre les boutons */
+      gap: 10px; /* Espacement réduit entre les boutons */
+    }
+  
+    /* Ajustements du container */
+    .container {
+      padding: 15px;
+    }
+  
+    /* Transactions Header */
+    .transactions-title {
+      font-size: 1.5rem;
+    }
+  
+    /* Bouton Ajouter une Transaction */
+    .add-transaction-btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+    }
+  
+    /* Bouton Retour aux Transactions */
+    .back-transaction-btn {
+      padding: 6px 12px;
+      font-size: 0.85rem;
+    }
+  
+    /* Transaction Item */
+    .transaction-item {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .transaction-user-info {
+      margin-bottom: 10px;
+    }
+  
+    .category-icon {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+  
+    .delete-button {
+      align-self: flex-end;
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+  
+    /* Add Transaction Form Adjustments */
+    .add-transaction-form {
+      max-width: 100%; /* S'adapte à la largeur de l'écran */
+    }
+  
+    .add-transaction-form form {
+      gap: 10px;
+    }
+  
+    .form-label {
+      font-size: 0.9rem;
+    }
+  
+    .form-input {
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+  
+    .location-btn {
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+  
+    .submit-btn {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .fullscreen-btn {
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+  
+    .fullscreen-btn i {
+      font-size: 1rem;
+    }
+  
+    .profile-image {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .transaction-user-photo {
+      width: 35px;
+      height: 35px;
+    }
+  
+    .transaction-username {
+      font-size: 0.9rem;
+    }
+  
+    .transaction-category {
+      font-size: 1rem;
+    }
+  
+    .transaction-amount {
+      font-size: 0.9rem;
+    }
+  
+    .transaction-date {
+      font-size: 0.8rem;    
+    }
+  }
+  

@@ -4,16 +4,48 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ajouter une Transaction</title>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="style/add-transaction.css">
 </head>
 
 <!--Display the side bar-->
-<div class="sidebar-container">
-  <iframe src="sidebar.html" class="sidebar-iframe" frameborder="0"></iframe>
+<div class="sidebar">
+  <div class="sidebar-header">
+    <a href="about.html" target="_parent">
+      <img src="assets/img/logo.png" alt="FundFlow Logo" class="sidebar-logo">
+    </a>
+    <h2 class="sidebar-title">FundFlow</h2>
+  </div>
+  <ul class="sidebar-menu">
+    <li>
+      <a href="about.html" class="sidebar-link" target="_parent" title="Home">
+        <i class="bi bi-speedometer2"></i> <span class="link-text">Home</span>
+      </a>
+    </li>
+    <li>
+      <a href="budget.html" class="sidebar-link active" target="_parent" title="Budget">
+        <i class="bi bi-pie-chart"></i> <span class="link-text">Budget</span>
+      </a>
+    </li>
+    <li>
+      <a href="transaction.html" class="sidebar-link" target="_parent" title="Transactions">
+        <i class="bi bi-arrow-left-right"></i> <span class="link-text">Transactions</span>
+      </a>
+    </li>
+    <li>
+      <a href="report.html" class="sidebar-link" target="_parent" title="Reports">
+        <i class="bi bi-file-earmark-text"></i> <span class="link-text">Reports</span>
+      </a>
+    </li>
+  </ul>
 </div>
 <!--Display the top bar-->
 <div class="topbar-container">
-  <iframe src="topbar.html" class="topbar-iframe" frameborder="0"></iframe>
+  <button id="fullscreenButton" class="fullscreen-btn" title="Plein écran">
+    <i class="bi bi-fullscreen"></i>
+  </button>
+  <div class="user-profile">
+    <img id="userProfileImage" src="assets/img/default-profile.png" alt="Profile" class="profile-image" onclick="redirectToProfile()">
+  </div>
 </div>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen main-content">
   <div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
