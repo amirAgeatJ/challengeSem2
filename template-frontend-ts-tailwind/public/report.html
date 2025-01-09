@@ -6,6 +6,7 @@
   <title>Gestion des Fichiers</title>
   <link rel="stylesheet" href="style/report.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="sidebar.css"> <!-- Inclure la sidebar CSS -->
 </head>
 
 <body>
@@ -19,7 +20,7 @@
     </div>
     <ul class="sidebar-menu">
       <li>
-        <a href="about.html" class="sidebar-link active" target="_parent" title="Home">
+        <a href="about.html" class="sidebar-link" target="_parent" title="Home">
           <i class="bi bi-speedometer2"></i> <span class="link-text">Home</span>
         </a>
       </li>
@@ -34,29 +35,30 @@
         </a>
       </li>
       <li>
-        <a href="report.html" class="sidebar-link" target="_parent" title="Reports">
+        <a href="report.html" class="sidebar-link active" target="_parent" title="Reports">
           <i class="bi bi-file-earmark-text"></i> <span class="link-text">Reports</span>
         </a>
       </li>
     </ul>
   </div>
 
-  <!-- Top Bar -->
-  <div class="top-bar">
-    <button id="toggleCurrencyButton" class="currency-converter-btn" title="Convertir la devise">
-      USD
-    </button>
-    <div class="user-profile">
-      <img id="userProfileImage" src="assets/img/default-profile.png" alt="Profile" class="profile-image" onclick="redirectToProfile()">
-    </div>
-  </div>
-
-  <!-- Main Content -->
-  <div class="main-content">
-    <h1 class="text-2xl font-bold mb-6">Uploader et Télécharger des Factures</h1>
-
+  <!-- Contenu principal -->
+<div class="main-content">
+  <!-- Topbar -->
+<div class="top-bar">
+<button id="fullscreenButton" class="fullscreen-btn" title="Plein écran">
+ <i class="bi bi-fullscreen"></i>
+</button>
+<div class="user-profile">
+   <img id="userProfileImage" src="assets/img/default-profile.png" alt="Profile" class="profile-image" onclick="redirectToProfile()">
+</div>
+</div>
+<div class="main-title">
+  <h1 class="home-title">Reports</h1>
+  <p class="subtitle">Take a look of your reports</p>
+</div>
     <!-- Upload Section -->
-    <div class="container upload-section">
+    <div class="container upload-section" style="width: 40%; margin : auto; margin-top: -10px;">
       <h2 class="text-lg font-bold mb-4">Uploader une facture</h2>
       <input type="file" id="fileInput" class="mb-4 border border-gray-300 p-2 rounded w-full" />
       <button id="uploadButton" class="bg-blue-500 text-white p-2 rounded w-full mb-4">Uploader</button>
@@ -66,7 +68,8 @@
     </div>
 
     <!-- Download Section -->
-    <div class="container download-section">
+    <h2 class="transactions-title" style="margin-left: 20px; margin-top: -80px;">Vos documents</h2>
+    <div class="container download-section" style="width: 40%; margin : auto; margin-top: -10px;">
       <h2 class="text-lg font-bold mb-4">Factures Disponibles</h2>
       <ul id="fileList" class="list-disc pl-5 text-gray-700">
         <!-- La liste des fichiers sera affichée ici -->

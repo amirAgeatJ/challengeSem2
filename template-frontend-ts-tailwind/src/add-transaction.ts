@@ -220,7 +220,7 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
     }
 
     alert("Transaction ajoutée avec succès !");
-    window.location.href = "about.html";
+    window.location.href = "transaction.html";
   } catch (error) {
     console.error("Erreur lors de l'ajout de la transaction:", error);
     alert("Une erreur est survenue. Veuillez réessayer.");

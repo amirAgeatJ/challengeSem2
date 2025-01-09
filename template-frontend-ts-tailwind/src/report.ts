@@ -197,23 +197,60 @@ function redirectToProfile() {
 
 
 
-// Met à jour la liste des fichiers
+// Deletes a file from IndexedDB
+async function deleteFile(fileId: string): Promise<void> {
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('files', 'readwrite');
+    const store = transaction.objectStore('files');
+    const request = store.delete(fileId);
+
+    request.onsuccess = () => resolve();
+    request.onerror = () => reject('Erreur lors de la suppression du fichier.');
+  });
+}
+
 async function updateFileList(userId: string) {
   const fileList = document.getElementById('fileList') as HTMLUListElement;
   fileList.innerHTML = '';
 
   try {
     const files = await getFilesByUser(userId);
+
+    if (files.length === 0) {
+      const emptyState = document.createElement('li');
+      emptyState.textContent = 'Aucun fichier disponible.';
+      emptyState.className = 'text-gray-500 text-center';
+      fileList.appendChild(emptyState);
+      return;
+    }
+
     files.forEach((file) => {
       const listItem = document.createElement('li');
       listItem.textContent = file.name;
+      listItem.className = 'flex justify-between items-center mb-2';
+
+      const buttonContainer = document.createElement('div');
+      buttonContainer.className = 'flex gap-4';
 
       const downloadButton = document.createElement('button');
-      downloadButton.textContent = 'Télécharger';
-      downloadButton.className = 'ml-2 bg-green-500 text-white p-1 rounded';
+      downloadButton.innerHTML = '<i class="bi bi-download"></i> Télécharger';
+      downloadButton.className = 'download-button';
       downloadButton.addEventListener('click', () => downloadFile(file.name, file.content, file.type));
 
-      listItem.appendChild(downloadButton);
+      const deleteButton = document.createElement('button');
+      deleteButton.innerHTML = '<i class="bi bi-trash"></i> Supprimer';
+      deleteButton.className = 'delete-button';
+      deleteButton.addEventListener('click', async () => {
+        await deleteFile(file.id);
+        alert('Fichier supprimé avec succès.');
+        updateFileList(userId);
+      });
+
+      buttonContainer.appendChild(downloadButton);
+      buttonContainer.appendChild(deleteButton);
+
+      listItem.appendChild(buttonContainer);
       fileList.appendChild(listItem);
     });
   } catch (error) {
