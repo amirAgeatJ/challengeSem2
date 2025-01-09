@@ -17,6 +17,24 @@ function initDB(): Promise<IDBDatabase> {
   });
 }
 
+
+function initUserDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('UserDatabase', 7);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      if (!db.objectStoreNames.contains('users')) {
+        db.createObjectStore('users', { keyPath: 'id' });
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 // Convertit un fichier en Base64
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -142,6 +160,43 @@ function setupDragAndDrop() {
   });
 }
 
+
+async function getUserById(userId: string): Promise<any | null> {
+  const db = await initUserDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('users', 'readonly');
+    const store = transaction.objectStore('users');
+    const request = store.get(userId);
+
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject("Erreur lors de la récupération de l'utilisateur.");
+  });
+}
+
+
+async function displayUserProfile() {
+  const userId = localStorage.getItem("idUser");
+  if (!userId) {
+    console.error("Utilisateur non connecté.");
+    return;
+  }
+
+  const user = await getUserById(userId);
+  const userProfileImage = document.getElementById("userProfileImage") as HTMLImageElement;
+
+  if (user && user.profileImage) {
+    userProfileImage.src = user.profileImage;
+  } else {
+    userProfileImage.src = "assets/img/default-profile.png";
+  }
+}
+
+function redirectToProfile() {
+  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
+}
+
+
+
 // Met à jour la liste des fichiers
 async function updateFileList(userId: string) {
   const fileList = document.getElementById('fileList') as HTMLUListElement;
@@ -177,4 +232,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   setupDragAndDrop();
   updateFileList(userId);
+  displayUserProfile();
 });
