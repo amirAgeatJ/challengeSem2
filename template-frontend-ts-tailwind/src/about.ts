@@ -48,6 +48,27 @@ function initUserDB(): Promise<IDBDatabase> {
   });
 }
 
+
+function initDB(): Promise<IDBDatabase> {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open('TransactionDatabase', 4);
+
+    request.onupgradeneeded = (event) => {
+      const db = (event.target as IDBOpenDBRequest).result;
+
+      // Crée les Object Stores si nécessaires
+      if (!db.objectStoreNames.contains('transactions')) {
+        db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains('budgets')) {
+        db.createObjectStore('budgets', { keyPath: 'userId' });
+      }
+    };
+
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
 // ------------------------------
 // Fonctions de récupération (CRUD)
 // ------------------------------
@@ -277,6 +298,39 @@ function copyTotalBudgetToClipboard() {
   }
 }
 
+async function getBudget(): Promise<any | null> {
+  const userId = localStorage.getItem('idUser');
+  if (!userId) {
+    console.error('Utilisateur non connecté.');
+    return null;
+  }
+
+  const db = await initDB();
+  return new Promise((resolve, reject) => {
+    const transaction = db.transaction('budgets', 'readonly');
+    const store = transaction.objectStore('budgets');
+    const request = store.get(userId);
+
+    request.onsuccess = () => resolve(request.result || null);
+    request.onerror = () => reject('Erreur lors de la récupération du budget.');
+  });
+}
+
+async function displayBudget() {
+  const budget = await getBudget();
+  if (!budget) {
+    console.log('Aucun budget trouvé.');
+    return;
+  }
+
+  (document.getElementById('transportBudget') as HTMLInputElement).value = budget.transport || '';
+  (document.getElementById('leisureBudget') as HTMLInputElement).value = budget.leisure || '';
+  (document.getElementById('healthBudget') as HTMLInputElement).value = budget.health || '';
+  (document.getElementById('housingBudget') as HTMLInputElement).value = budget.housing || '';
+  (document.getElementById('alimentaireBudget') as HTMLInputElement).value = budget.alimentaire || '';
+  (document.getElementById('educationBudget') as HTMLInputElement).value = budget.education || '';
+}
+
 /**
  * Affiche la liste des transactions
  */
@@ -308,6 +362,9 @@ async function displayTransactions() {
       };
     })
   );
+
+
+
 
   // Conversion
   const factor = currentCurrency === 'USD' ? usdRate : 1;
@@ -348,6 +405,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await displayTransactions();
     await displayTransactionSummary();
     await displayUserProfile(); // Affiche l'image du profil utilisateur
+    await displayBudget();
 
 
     // 3) Gère le bouton de conversion (basculer EUR <-> USD)
@@ -367,6 +425,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         await displayUserBudget();
         await displayTransactions();
         await displayTransactionSummary();
+        await displayBudget();
+
       });
     }
 

@@ -231,6 +231,104 @@ body {
   color: #1D1F24;
   margin: 10px 0;
 }
+
+
+/* ----------------------
+   Carroussel Styling
+---------------------- */
+/* Budget Carousel */
+.carousel-title {
+  margin: 20px 0; /* Add margin for spacing */
+  text-align: left; /* Align text to the left */
+  margin-left: 40px; /* Align the text with the card */
+  font-family: 'Poppins', sans-serif; /* Use Poppins font */
+  font-weight: 600; /* Medium weight */
+  font-size: 24px; /* Set font size to 20px */
+  color: #333; /* Adjust the color if needed */
+}
+
+.budget-carousel-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center; /* Center the carousel within the container */
+  margin-right: 155px;
+  margin-left: 20px;
+}
+
+.budget-carousel {
+  display: flex;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  gap: 20px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 20px;
+  width: 1500px;
+  height: 134px;
+  
+}
+
+.budget-carousel::-webkit-scrollbar {
+  display: none; /* Masquer la scrollbar */
+}
+
+.budget-card {
+  min-width: 200px; /* Ajustez la largeur selon vos besoins */
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  flex: 0 0 auto;
+}
+
+.budget-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #555;
+}
+
+.budget-input {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+}
+
+/* Carousel Buttons */
+.carousel-button {
+  background-color: #1D1F24;
+  border: none;
+  color: #fff;
+  width: 40px; /* Define a fixed width */
+  height: 40px; /* Define a fixed height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.carousel-button.left {
+  left: 45px; /* Position to the left of the carousel */
+}
+
+.carousel-button.right {
+  right: 45px; /* Position to the right of the carousel */
+}
+
+.carousel-button i {
+  font-size: 1.2rem; /* Adjust icon size if necessary */
+  line-height: 1; /* Ensure line-height doesn't affect vertical centering */
+}
 /* ----------------------
    Summary Styling
 ---------------------- */
@@ -261,20 +359,28 @@ body {
 }
 
 /* ----------------------
-   Transaction Container
+   Transaction Styling
 ---------------------- */
+
+.transaction-title {
+  margin: 20px 0;
+  text-align: left;
+  margin-left: 40px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  font-size: 24px;
+  color: #333;
+}
+
 .transaction-container {
   background: #fff;
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 20px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-}
-
-.transaction-container h2 {
-  font-size: 1.5rem;
-  color: #333;
-  margin-bottom: 20px;
+  margin-left: 40px;
+  width: 1500px;
+  height: 134px;
 }
 
 #transactionList {
@@ -293,50 +399,91 @@ body {
   background: #f9fafb;
 }
 
-.transaction-item p {
-  margin: 0;
-  color: #333;
-  font-size: 0.9rem;
+.transaction-user-info {
+  display: flex;
+  align-items: center;
 }
 
-/* ----------------------
-   Responsive Design
----------------------- */
-@media screen and (max-width: 768px) {
-  /* Ajustements pour la sidebar en bas */
+.transaction-user-photo {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
 
-  /* Supprimer la marge à gauche */
+.transaction-details {
+  display: flex;
+  align-items: center;
+  margin-left: 143px; /* Add space from previous field */
+}
+
+.transaction-details p {
+  margin: 0 10px; /* Space between text items */
+}
+
+.category-icon {
+  margin-right: 5px; /* Reduce space to bring category name closer */
+}
+
+.transaction-details > p {
+  width: 143px; /* Set a fixed width to each detail for spacing */
+}
+
+.delete-button {
+  background-color: #ff4d4f;
+  color: #fff;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.delete-button:hover {
+  background-color: #e43e3e;
+}
+.transaction-category {
+  display: flex;
+  align-items: center;
+}
+
+.category-icon {
+  margin-right: 5px; /* Adjust spacing between icon and text */
+}
+/* Responsive Design Adjustments */
+@media screen and (max-width: 768px) {
+  /* Adjust main content margin for smaller screens */
   .main-content {
     margin-left: 0;
-    margin-bottom: 60px; /* Espace pour la sidebar en bas */
+    margin-bottom: 60px;  /* Space for the sidebar at the bottom */
   }
 
-  /* Ajustements pour la barre supérieure */
+  /* Adjust top bar styling */
   .top-bar {
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.8); /* Assurez-vous que le fond est semi-transparent ou ajusté */
+    background-color: rgba(255, 255, 255, 0.8); /* Semi-transparent background */
   }
 
-  /* Responsive de la summary */
+  /* Adjust summary section for smaller screens */
   .summary {
     flex-direction: column;
     gap: 15px;
     padding: 10px;
   }
 
-  /* Responsive des cartes */
+  /* Adjust card padding for smaller screens */
   .card, .summary, .transaction-container {
     padding: 15px;
   }
 
-  /* Réorganiser la sidebar */
+  /* Reorganize the sidebar to be at the bottom */
   .sidebar {
     position: fixed;
     bottom: 0;
     top: auto;
     left: 0;
     width: 100%;
-    height: 60px; /* Hauteur de la barre en bas */
+    height: 60px; /* Height of the bottom bar */
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
@@ -364,7 +511,7 @@ body {
   }
 
   .sidebar-link .link-text {
-    display: none;
+    display: none; /* Hide text to save space */
   }
 
   .sidebar-link i {
@@ -372,12 +519,12 @@ body {
     margin: 0;
   }
 
-  /* Ajustements du grid */
+  /* Grid adjustments for smaller screens */
   .budget-grid {
     grid-template-columns: 1fr;
   }
 
-  /* Taille des textes */
+  /* Text size adjustments for smaller screens */
   .page-header h2 {
     font-size: 1.5rem;
   }
@@ -390,7 +537,7 @@ body {
     font-size: 1.3rem;
   }
 
-  /* Boutons */
+  /* Button adjustments for smaller screens */
   .currency-converter-btn,
   .save-button {
     padding: 8px 16px;

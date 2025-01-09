@@ -173,39 +173,40 @@ async function displayTransactions() {
 
     // Générer le HTML pour chaque transaction
     transactionList.innerHTML = transactions
-      .map((transaction) => {
-        const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
-        const categoryIcon = getCategoryIcon(transaction.category);
-        const userPhoto = user?.profileImage
-          ? `<img src="${user.profileImage}" alt="Profile" class="transaction-user-photo">`
-          : `<img src="assets/img/default-profile.png" alt="Profile" class="transaction-user-photo">`;
-        const username = user?.username || "Utilisateur";
+  .map((transaction) => {
+    const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
+    const categoryIcon = getCategoryIcon(transaction.category);
+    const userPhoto = user?.profileImage
+      ? `<img src="${user.profileImage}" alt="Profile" class="transaction-user-photo">`
+      : `<img src="assets/img/default-profile.png" alt="Profile" class="transaction-user-photo">`;
+    const username = user?.username || "Utilisateur";
 
-        return `
-          <div class="transaction-item">
-            <div class="transaction-user-info">
-              ${userPhoto}
-              <span class="transaction-username">${username}</span>
-            </div>
-            <div class="category-icon">${categoryIcon}</div>
-            <div class="transaction-details">
-              <p class="transaction-category">${transaction.category}</p>
-              <p class="transaction-amount">${transaction.amount.toFixed(2)} €</p>
-              <p class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</p>
-            </div>
-            <button
-              class="delete-button"
-              data-id="${transaction.id}"
-              data-type="${transaction.type}"
-              data-category="${transaction.category}"
-              data-amount="${transaction.amount}"
-            >
-              Supprimer
-            </button>
-          </div>
-        `;
-      })
-      .join("");
+    return `
+      <div class="transaction-item">
+        <div class="transaction-user-info">
+          ${userPhoto}
+          <span class="transaction-username">${username}</span>
+        </div>
+        <div class="transaction-details">
+          <p class="transaction-category">
+            <span class="category-icon">${categoryIcon}</span> ${transaction.category}
+          </p>
+          <p class="transaction-amount">${transaction.amount.toFixed(2)} €</p>
+          <p class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</p>
+        </div>
+        <button
+          class="delete-button"
+          data-id="${transaction.id}"
+          data-type="${transaction.type}"
+          data-category="${transaction.category}"
+          data-amount="${transaction.amount}"
+        >
+          Supprimer
+        </button>
+      </div>
+    `;
+  })
+  .join("");
 
     // Ajouter des écouteurs d'événements aux boutons Supprimer
     document.querySelectorAll(".delete-button").forEach((button) => {
