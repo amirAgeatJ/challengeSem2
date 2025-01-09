@@ -2,13 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Historique des Transactions</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Transactions - Gestion des Transactions</title>
   <link rel="stylesheet" href="style/transaction.css">
+  <!-- Inclure Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
-  <!-- Conteneur de la Sidebar -->
+<body data-page="transaction">
+  <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
       <a href="about.html" target="_parent">
@@ -28,7 +30,7 @@
         </a>
       </li>
       <li>
-        <a href="transaction.html" class="sidebar-link " target="_parent" title="Transactions">
+        <a href="transaction.html" class="sidebar-link active" target="_parent" title="Transactions">
           <i class="bi bi-arrow-left-right"></i> <span class="link-text">Transactions</span>
         </a>
       </li>
@@ -49,48 +51,33 @@
       <img id="userProfileImage" src="assets/img/default-profile.png" alt="Profile" class="profile-image" onclick="redirectToProfile()">
     </div>
   </div>
-
-  <!-- Contenu principal -->
+  
+  <!-- Main Content -->
   <div class="main-content">
-    <!-- Contenu des transactions -->
-    <div class="container">
-      <div class="transactions-header">
-        <h2 class="transactions-title">Transaction History</h2>
-        <!-- Bouton Ajouter une Transaction -->
-        <a href="add-transaction.html" class="add-transaction-btn" title="Ajouter une Transaction">
-          <i class="bi bi-plus-circle"></i> Ajouter une Transaction
-        </a>
-      </div>
-      <!-- Zone des transactions -->
+    <!-- Title Section -->
+    <div class="page-header">
+      <h2>Transactions</h2>
+      <a href="add-transaction.html" class="back-link">
+        Ajouter une transaction →
+      </a>
+    </div>
+  
+    <!-- Transaction List -->
+    <div class="transaction-list-container">
       <div id="transactionList" class="transaction-list">
-        <!-- Les transactions seront insérées ici -->
+        <!-- Les transactions seront affichées ici -->
       </div>
     </div>
+  
+    <!-- Chart (Optionnel) -->
+    <div class="chart-container">
+      <h2 class="chart-title">Analyse des Transactions</h2>
+      <canvas id="transactionChart"></canvas>
+    </div>
+  
   </div>
-
-  <script src="../dist/transaction.js"></script>
-  <script>
-    const fullscreenButton = document.getElementById('fullscreenButton');
-
-    fullscreenButton?.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          alert(`Erreur lors de la mise en plein écran: ${err.message}`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement) {
-        fullscreenButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
-        fullscreenButton.title = 'Quitter le plein écran';
-      } else {
-        fullscreenButton.innerHTML = '<i class="bi bi-fullscreen"></i>';
-        fullscreenButton.title = 'Plein écran';
-      }
-    });
-  </script>
+  
+  <!-- Scripts Communs -->
+  <script type="module" src="dist/transaction.js"></script> <!-- Script spécifique à la page Transaction -->
 </body>
 </html>

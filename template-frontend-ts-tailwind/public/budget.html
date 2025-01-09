@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="style/budget.css">
   <!-- Inclure Bootstrap Icons -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Charger chart.js via CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body>
+<body data-page="budget">
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-header">
@@ -114,51 +115,7 @@
   
   </div>
   
-  <script src="../dist/budget.js"></script>
-  <script>
-    // Script pour gérer le défilement du carousel
-    const budgetCarousel = document.getElementById('budgetCarousel');
-    const prevBudget = document.getElementById('prevBudget');
-    const nextBudget = document.getElementById('nextBudget');
-
-    prevBudget.addEventListener('click', () => {
-      budgetCarousel.scrollBy({
-        top: 0,
-        left: -200, // Ajustez cette valeur en fonction de la largeur des cartes
-        behavior: 'smooth'
-      });
-    });
-
-    nextBudget.addEventListener('click', () => {
-      budgetCarousel.scrollBy({
-        top: 0,
-        left: 200, // Ajustez cette valeur en fonction de la largeur des cartes
-        behavior: 'smooth'
-      });
-    });
-
-    // Script pour gérer le bouton fullscreen
-    const fullscreenButton = document.getElementById('fullscreenButton');
-
-    fullscreenButton?.addEventListener('click', () => {
-      if (!document.fullscreenElement) {
-        document.documentElement.requestFullscreen().catch(err => {
-          alert(`Erreur lors de la mise en plein écran: ${err.message}`);
-        });
-      } else {
-        document.exitFullscreen();
-      }
-    });
-
-    document.addEventListener('fullscreenchange', () => {
-      if (document.fullscreenElement) {
-        fullscreenButton.innerHTML = '<i class="bi bi-fullscreen-exit"></i>';
-        fullscreenButton.title = 'Quitter le plein écran';
-      } else {
-        fullscreenButton.innerHTML = '<i class="bi bi-fullscreen"></i>';
-        fullscreenButton.title = 'Plein écran';
-      }
-    });
-  </script>
+  <!-- Scripts Spécifiques -->
+  <script type="module" src="dist/budget.js"></script> <!-- Script spécifique à la page Budget -->
 </body>
 </html>

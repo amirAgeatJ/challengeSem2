@@ -7,37 +7,39 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
-  <h2 class="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
-  <form id="registerForm">
-    <div class="mb-4">
-      <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
-      <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded">
-    </div>
-    <div class="mb-4">
-      <label for="email" class="block text-gray-700">Email</label>
-      <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded">
-    </div>
-    <div class="mb-4">
-      <label for="password" class="block text-gray-700">Mot de passe</label>
-      <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
-    </div>
-    <div class="mb-4">
-      <label for="confirmPassword" class="block text-gray-700">Confirmer le mot de passe</label>
-      <input type="password" id="confirmPassword" class="w-full p-2 border border-gray-300 rounded">
-    </div>
-    <p id="passwordError" class="text-red-500 text-sm hidden">Les mots de passe ne correspondent pas.</p>
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
+  <div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
+    <h2 class="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
+    <form id="registerForm">
+      <div class="mb-4">
+        <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
+        <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" required>
+      </div>
+      <div class="mb-4">
+        <label for="email" class="block text-gray-700">Email</label>
+        <input type="email" id="email" class="w-full p-2 border border-gray-300 rounded" required>
+      </div>
+      <div class="mb-4">
+        <label for="password" class="block text-gray-700">Mot de passe</label>
+        <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded" required>
+      </div>
+      <div class="mb-4">
+        <label for="confirmPassword" class="block text-gray-700">Confirmer le mot de passe</label>
+        <input type="password" id="confirmPassword" class="w-full p-2 border border-gray-300 rounded" required>
+      </div>
+      <p id="passwordError" class="text-red-500 text-sm hidden">Les mots de passe ne correspondent pas.</p>
+      <div class="mb-4 flex items-center">
+        <input type="checkbox" id="termsCheckbox" class="mr-2">
+        <label for="termsCheckbox" class="text-gray-700 text-sm">
+          En cochant cette case, j'accepte les
+          <a href="#" class="text-blue-500">termes et conditions</a>.
+        </label>
+      </div>
+      <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
+    </form>
+  </div>
 
-    <div class="mb-4 flex items-center">
-      <input type="checkbox" id="termsCheckbox" class="mr-2">
-      <label for="termsCheckbox" class="text-gray-700 text-sm">
-        En cochant cette case, j'accepte les
-        <a href="#" class="text-blue-500">termes et conditions</a>.
-      </label>
-    </div>
-  </form>
-</div>
-<script src="../dist/register.js"></script>
+
+  <!-- Scripts Communs -->
+  <script type="module" src="dist/register.js"></script> <!-- Script spécifique à la page Register -->
 </body>
 </html>

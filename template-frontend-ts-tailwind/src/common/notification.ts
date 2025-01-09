@@ -1,37 +1,43 @@
-function showNotification(
-  title: string,
-  options?: NotificationOptions,
-  vibrationPattern?: number[],
-): void {
-  if (!("Notification" in window)) {
-    console.warn("Les notifications ne sont pas supportées par ce navigateur.");
-    return;
-  }
+// src/common/notification.ts
 
-  const createNotification = () => {
-    const notification = new Notification(title, options);
-    notification.onclick = () => {
-      console.log("Notification cliquée !");
-    };
-    notification.onclose = () => {
-      console.log("Notification fermée.");
-    };
-    if (vibrationPattern && "vibrate" in navigator) {
-      navigator.vibrate(vibrationPattern);
+/**
+ * Fonction pour afficher une notification locale.
+ * @param message Message de la notification.
+ */
+export async function notifyUser(message: string): Promise<void> {
+    if (!('Notification' in window)) {
+      console.warn('Les notifications ne sont pas prises en charge par ce navigateur.');
+      return;
     }
-  };
-
-  if (Notification.permission === "granted") {
-    createNotification();
-  } else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then((permission) => {
-      if (permission === "granted") {
-        createNotification();
-      } else {
-        console.warn("Permission de notification refusée.");
+  
+    if (Notification.permission === 'granted') {
+      new Notification(message);
+    } else if (Notification.permission !== 'denied') {
+      const permission = await Notification.requestPermission();
+      if (permission === 'granted') {
+        new Notification(message);
       }
-    });
-  } else {
-    console.warn("Les notifications sont désactivées pour ce site.");
+    }
   }
-}
+  
+  /**
+   * Fonction pour envoyer une notification push via le service worker.
+   * @param title Titre de la notification.
+   * @param body Corps de la notification.
+   */
+  export function sendPushNotification(title: string, body: string): void {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .ready
+        .then((registration) => {
+          registration.showNotification(title, {
+            body: body,
+            icon: '/icon.png',
+          });
+        })
+        .catch((error) => {
+          console.error("Erreur lors de l'envoi de la notification push :", error);
+        });
+    }
+  }
+  

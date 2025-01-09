@@ -1,50 +1,8 @@
-// Interface utilisateur
-interface User {
-  id: string; // Clé primaire
-  username: string;
-  email: string;
-  password: string;
-  profileImage?: string; // Facultatif
-}
+// src/register.ts
 
-// Initialise IndexedDB
-function initDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 7);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'id' });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Ajoute un utilisateur dans IndexedDB
-async function addUser(user: User): Promise<void> {
-  const db = await initDB();
-  const transaction = db.transaction('users', 'readwrite');
-  const store = transaction.objectStore('users');
-
-  return new Promise((resolve, reject) => {
-    const request = store.add(user);
-
-    request.onsuccess = () => {
-      console.log("Utilisateur ajouté avec succès !");
-      resolve();
-    };
-
-    request.onerror = () => {
-      console.error("Erreur lors de l'ajout de l'utilisateur", request.error);
-      reject(request.error);
-    };
-  });
-}
+import { User, addUser, generateUUID } from './common/db.js'; // Importation de User, addUser et generateUUID depuis db.ts
+import { redirectToProfile } from './userProfile.js'; // Importation depuis userProfile.ts
+import { initFullscreenButton } from './common/fullscreen.js'; // Importation depuis fullscreen.ts
 
 // Fonction pour vérifier si les mots de passe correspondent
 function validatePassword(): boolean {
@@ -93,7 +51,7 @@ document.getElementById('registerForm')?.addEventListener('submit', async (event
   const email = (document.getElementById('email') as HTMLInputElement).value.trim();
   const password = (document.getElementById('password') as HTMLInputElement).value.trim();
 
-  const userId = crypto.randomUUID();
+  const userId = generateUUID();
   const user: User = { id: userId, username, email, password };
 
   try {
@@ -106,7 +64,11 @@ document.getElementById('registerForm')?.addEventListener('submit', async (event
   }
 });
 
+// Gestionnaire d'événements pour l'image de profil
+document.getElementById("userProfileImage")?.addEventListener("click", redirectToProfile);
+
 // Initialisation de l'application
 document.addEventListener('DOMContentLoaded', () => {
   console.log("Formulaire prêt.");
+  initFullscreenButton('fullscreenButton'); // Initialiser le bouton plein écran
 });
