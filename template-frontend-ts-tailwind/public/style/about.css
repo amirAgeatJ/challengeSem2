@@ -358,6 +358,23 @@ body {
    Transaction Styling
 ---------------------- */
 
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  padding: 20px;
+  border-radius: 8px;
+  background-color: #fff;
+}
+.empty-state p {
+  margin-top: 10px;
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+}
+
 .transaction-title {
   margin: 20px 0;
   text-align: left;
@@ -376,7 +393,8 @@ body {
   margin-bottom: 20px;
   margin-left: 40px;
   width: 1480px;
-  height: 134px;
+  max-height: 300px; /* Set a maximum height */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 #transactionList {
@@ -426,7 +444,7 @@ body {
 }
 
 .delete-button {
-  background-color: #ff4d4f;
+  background-color: #c43636;
   color: #fff;
   border: none;
   padding: 5px 10px;

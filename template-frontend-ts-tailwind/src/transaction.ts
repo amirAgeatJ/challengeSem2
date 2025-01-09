@@ -167,7 +167,12 @@ async function displayTransactions() {
     if (!transactionList) return;
 
     if (transactions.length === 0) {
-      transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
+      transactionList.innerHTML = `
+      <div class="empty-state">
+        <i class="bi bi-info-circle" style="font-size: 2rem; color: #7662EA;"></i>
+        <p>Votre historique est vide. Effectuez votre première transaction.</p>
+      </div>
+    `;
       return;
     }
 
