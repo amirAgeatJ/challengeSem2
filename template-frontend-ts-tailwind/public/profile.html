@@ -4,52 +4,75 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Profil Utilisateur</title>
-  <link rel="stylesheet" href="styles.css">
-  <style>
-    /* Petit style pour placer la batterie en haut à droite */
-    #batteryStatus {
-      position: fixed;
-      top: 10px;
-      right: 10px;
-      background: #f7f7f7;
-      padding: 8px 12px;
-      border-radius: 4px;
-      font-family: sans-serif;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    }
-  </style>
+  <link rel="stylesheet" href="style/profile.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
-
-<div id="batteryStatus">Batterie : --%</div>
-
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
-  <h2 class="text-2xl font-bold mb-6 text-center">Mettre à Jour le Profil</h2>
-  <form id="profileForm">
-    <div class="mb-4">
-      <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
-      <!-- Le champ username sera pré-rempli avec le script -->
-      <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre nom d'utilisateur">
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <a href="about.html" target="_parent">
+        <img src="assets/img/logo.png" alt="FundFlow Logo" class="sidebar-logo">
+      </a>
+      <h2 class="sidebar-title">FundFlow</h2>
     </div>
+    <ul class="sidebar-menu">
+      <li>
+        <a href="about.html" class="sidebar-link active" target="_parent" title="Home">
+          <i class="bi bi-speedometer2"></i> <span class="link-text">Home</span>
+        </a>
+      </li>
+      <li>
+        <a href="budget.html" class="sidebar-link" target="_parent" title="Budget">
+          <i class="bi bi-pie-chart"></i> <span class="link-text">Budget</span>
+        </a>
+      </li>
+      <li>
+        <a href="transaction.html" class="sidebar-link" target="_parent" title="Transactions">
+          <i class="bi bi-arrow-left-right"></i> <span class="link-text">Transactions</span>
+        </a>
+      </li>
+      <li>
+        <a href="report.html" class="sidebar-link" target="_parent" title="Reports">
+          <i class="bi bi-file-earmark-text"></i> <span class="link-text">Reports</span>
+        </a>
+      </li>
+    </ul>
+  </div>
 
-    <button id="startIdleDetection" type="button">Activer la Détection d'Inactivité</button>
+  <!-- Battery Status -->
+  <div id="batteryStatus">Batterie : --%</div>
 
-    <div class="mb-4">
-      <label class="block text-gray-700">Photo de Profil</label>
-      <video id="camera" class="w-full rounded mb-2" autoplay></video>
-      <canvas id="canvas" class="hidden"></canvas>
-      <input type="hidden" id="profileImage">
-      <button type="button" id="captureButton" class="bg-blue-500 text-white p-2 rounded mb-4">Prendre une photo</button>
-      <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto" src="" alt="Photo de profil">
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="container">
+      <h2 class="transactions-title">Profil Utilisateur</h2>
+      <form id="profileForm">
+        <div class="mb-4">
+          <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
+          <!-- Le champ username sera pré-rempli avec le script -->
+          <input type="text" id="username" class="w-full p-2 border border-gray-300 rounded" placeholder="Votre nom d'utilisateur">
+        </div>
+
+        <button id="startIdleDetection" type="button" class="submit-button">Activer la Détection d'Inactivité</button>
+
+        <div class="mb-4">
+          <label class="block text-gray-700">Photo de Profil</label>
+          <video id="camera" autoplay></video>
+          <canvas id="canvas" class="hidden"></canvas>
+          <input type="hidden" id="profileImage">
+          <button type="button" id="captureButton" class="bg-blue-500 text-white p-2 rounded mb-4">Prendre une photo</button>
+          <img id="profileImageDisplay" class="w-32 h-32 rounded-full mx-auto" src="" alt="Photo de profil">
+        </div>
+
+        <button type="submit" class="submit-button">Enregistrer</button>
+      </form>
     </div>
+  </div>
 
-    <button type="submit" class="w-full bg-green-500 text-white p-2 rounded">Enregistrer</button>
-  </form>
-</div>
-
-<!-- Vos scripts compilés depuis TypeScript -->
-<script src="../dist/profile.js"></script>
-<script src="../dist/common/notification.js"></script>
+  <!-- Scripts -->
+  <script src="../dist/profile.js"></script>
+  <script src="../dist/common/notification.js"></script>
 </body>
 </html>

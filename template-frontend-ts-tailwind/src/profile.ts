@@ -211,6 +211,18 @@ function startCamera() {
       try {
         await updateUser(updatedUser);
         alert('Photo et profil mis à jour avec succès !');
+
+        // **Mise à Jour de l'Image de Profil dans le DOM**
+        const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement | null;
+        if (profileImageDisplay) {
+          profileImageDisplay.src = imageData;
+        }
+
+        // **Mise à Jour du Champ Caché**
+        const profileImageInput = document.getElementById('profileImage') as HTMLInputElement | null;
+        if (profileImageInput) {
+          profileImageInput.value = imageData;
+        }
       } catch (error) {
         console.error(error);
         alert('Erreur lors de la mise à jour du profil.');
@@ -276,7 +288,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const profileImageDisplay = document.getElementById('profileImageDisplay') as HTMLImageElement | null;
     if (profileImageDisplay) {
-      profileImageDisplay.src = user.profileImage;
+      profileImageDisplay.src = user.profileImage || 'assets/img/default-profile.png';
     }
   } else {
     alert('Utilisateur non trouvé.');

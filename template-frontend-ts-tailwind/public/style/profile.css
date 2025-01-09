@@ -1,0 +1,435 @@
+/* ----------------------
+   Global Styles
+---------------------- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f5fa;
+    color: #333;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    min-height: 100vh;
+    transition: margin 0.3s ease;
+  }
+  
+  /* ----------------------
+     Sidebar Styling
+  ---------------------- */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100%;
+    background-color: #ffffff; /* Couleur blanche pour un design épuré */
+    border-right: 1px solid #e6e6e6; /* Ligne de séparation */
+    padding: 20px 15px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Légère ombre */
+    transition: all 0.3s ease;
+    z-index: 1000;
+  }
+  
+  .sidebar-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .sidebar-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+  
+  .sidebar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #333333; /* Gris foncé pour le texte */
+  }
+  
+  .sidebar-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    flex-grow: 1;
+  }
+  
+  .sidebar-menu li {
+    margin-bottom: 15px;
+  }
+  
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #555555;
+    padding: 10px 15px;
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  .sidebar-link i {
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+  
+  .link-text {
+    display: inline;
+    transition: opacity 0.3s;
+  }
+  
+  .sidebar-link.active,
+  .sidebar-link:hover {
+    background-color: #f0f4ff; /* Couleur bleu clair */
+    color: #4a6cf7; /* Bleu pour l'icône et le texte */
+  }
+  
+  .sidebar-link.active i,
+  .sidebar-link:hover i {
+    color: #4a6cf7;
+  }
+  
+  .sidebar-footer {
+    margin-top: auto;
+    text-align: center;
+    font-size: 0.85rem;
+    color: #888888;
+  }
+  
+  .sidebar-footer a {
+    text-decoration: none;
+    color: #4a6cf7;
+    font-weight: 500;
+  }
+  
+  /* ----------------------
+     Battery Status Styling
+  ---------------------- */
+  #batteryStatus {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background: #f7f7f7;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-family: sans-serif;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1001; /* Au-dessus de la sidebar */
+  }
+  
+  /* ----------------------
+     Main Content Styling
+  ---------------------- */
+  .main-content {
+    margin-left: 250px; /* Largeur de la sidebar */
+    margin-top: 0; /* Pas de marge supérieure car le statut de la batterie est fixé */
+    padding: 20px;
+    width: calc(100% - 250px);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: all 0.3s ease;
+  }
+  
+  .container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* ----------------------
+     Form Styling
+  ---------------------- */
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  form label {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 5px;
+  }
+  
+  form input[type="text"],
+  form input[type="number"],
+  form input[type="email"],
+  form select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e6e6e6;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+  }
+  
+  form button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  #startIdleDetection {
+    background-color: #ff9800; /* Orange */
+    color: #fff;
+  }
+  
+  #startIdleDetection:hover {
+    background-color: #e68900;
+  }
+  
+  #captureButton {
+    background-color: #2196F3; /* Bleu */
+    color: #fff;
+  }
+  
+  #captureButton:hover {
+    background-color: #1976D2;
+  }
+  
+  .submit-button {
+    background-color: #4CAF50; /* Vert */
+    color: #fff;
+  }
+  
+  .submit-button:hover {
+    background-color: #45a049;
+  }
+  
+  #profileImageDisplay {
+    width: 128px;
+    height: 128px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  /* ----------------------
+     Video and Canvas Styling
+  ---------------------- */
+  video#camera {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+  
+  canvas#canvas {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-top: 10px;
+  }
+  
+  /* ----------------------
+     Responsive Styles
+  ---------------------- */
+  @media screen and (max-width: 768px) {
+    /* Masquer le statut de la batterie sur les petits écrans */
+    #batteryStatus {
+      display: none;
+    }
+    
+    /* Réduire la largeur de la sidebar */
+   /* ----------------------
+   Responsive Styles
+---------------------- */
+@media screen and (max-width: 768px) {
+    /* Repositionner la sidebar en bas */
+    .sidebar {
+      position: fixed;
+      bottom: 0;
+      top: auto;
+      left: 0;
+      width: 100%;
+      height: 60px; /* Hauteur réduite pour la barre inférieure */
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      padding: 0 10px;
+      border-right: none;
+      border-top: 1px solid #e5e5e5; /* Ligne de séparation en haut */
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+  
+    /* Masquer le header de la sidebar */
+    .sidebar-header {
+      display: none;
+    }
+  
+    /* Réorganiser le menu de la sidebar */
+    .sidebar-menu {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-around;
+      align-items: center;
+      flex-grow: 1;
+      margin: 0;
+      padding: 0;
+    }
+  
+    .sidebar-menu li {
+      margin: 0;
+    }
+  
+    .sidebar-link {
+      flex-direction: column;
+      padding: 5px;
+    }
+  
+    .sidebar-link .link-text {
+      display: none; /* Masquer le texte des liens */
+    }
+  
+    .sidebar-link i {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+  
+    /* Ajuster le contenu principal pour éviter qu'il ne soit caché par la sidebar */
+    .main-content {
+      margin-left: 0;
+      margin-bottom: 60px; /* Espace pour la sidebar en bas */
+      width: 100%;
+      transition: all 0.3s ease;
+    }
+  
+    /* Ajuster la topbar pour qu'elle occupe toute la largeur sur mobile */
+    .topbar-container {
+      left: 0;
+      width: 100%;
+    }
+  
+    /* Ajustements du budget carousel pour les petits écrans */
+    .budget-carousel-container {
+      position: relative;
+      padding: 0 40px; /* Espace pour les boutons */
+    }
+  
+    .budget-carousel {
+      gap: 15px;
+      padding: 10px;
+    }
+  
+    .budget-card {
+      min-width: 150px; /* Ajustez selon les besoins */
+      padding: 15px;
+    }
+  
+    .budget-title {
+      font-size: 1rem;
+    }
+  
+    .budget-input {
+      padding: 8px;
+      font-size: 0.9rem;
+    }
+  
+    /* Ajustements des paddings et marges */
+    .main-content {
+      padding: 15px;
+    }
+  
+    /* Ajustements des titres et liens */
+    .page-header h2 {
+      font-size: 1.5rem;
+    }
+  
+    .back-link {
+      font-size: 0.9rem;
+    }
+  
+    /* Ajustements du bouton d'enregistrement */
+    .save-button-container {
+      text-align: center;
+    }
+  
+    .save-button {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+    }
+  
+    /* Ajustements du conteneur de chart */
+    .chart-container {
+      padding: 15px;
+    }
+  
+    .chart-title {
+      font-size: 1.3rem;
+    }
+  
+    /* Ajustements des boutons du carousel */
+    .carousel-button.left {
+      left: 5px;
+    }
+  
+    .carousel-button.right {
+      right: 5px;
+    }
+  
+    /* Fullscreen Button Adjustment on Mobile */
+    .fullscreen-btn {
+      padding: 6px 10px;
+      font-size: 0.9rem;
+    }
+  
+    .fullscreen-btn i {
+      font-size: 1rem;
+    }
+  }
+  
+  /* Ajustements supplémentaires pour les très petits écrans */
+  @media screen and (max-width: 480px) {
+    .carousel-button {
+      padding: 8px;
+    }
+  
+    .carousel-button.left {
+      left: 0;
+    }
+  
+    .carousel-button.right {
+      right: 0;
+    }
+  
+    .sidebar-link i {
+      font-size: 1.3rem;
+    }
+  
+    .budget-input {
+      font-size: 0.8rem;
+    }
+  
+    .save-button {
+      padding: 8px 16px;
+      font-size: 0.9rem;
+    }
+  
+    .chart-title {
+      font-size: 1.2rem;
+    }
+  
+    /* Fullscreen Button Adjustment for Very Small Screens */
+    .fullscreen-btn {
+      padding: 5px 8px;
+      font-size: 0.8rem;
+    }
+  
+    .fullscreen-btn i {
+      font-size: 1rem;
+    }
+}}
+  
