@@ -1,8 +1,9 @@
 // src/profile.ts
 
 import { User, getUserById, updateUser } from './common/db.js'; // Import depuis db.ts
-import { notifyUser, sendPushNotification } from './common/notification.js'; // Import depuis notification.ts (si vous avez centralisé ces fonctions)
-import { setupIdleDetection } from './common/idleDetection.js'; // Import depuis idleDetection.ts (si vous avez centralisé ces fonctions)
+import { notifyUser, sendPushNotification } from './common/notification.js'; // Import depuis notification.ts
+import { setupIdleDetection } from './common/idleDetection.js'; // Import depuis idleDetection.ts
+import { initBatteryStatus } from './common/battery-status.js'; // Import du module Battery Status
 
 //////////////////////////
 // Fonctions de Mise à Jour du Profil
@@ -134,4 +135,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // Démarrer la caméra
   startCamera();
+
+  // Initialiser le statut de la batterie
+  initBatteryStatus();
 });

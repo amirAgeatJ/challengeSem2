@@ -239,6 +239,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     await displayTransactions();
     await displayTransactionSummary();
     await displayUserProfile(); // Affiche l'image du profil utilisateur
+      (window as any).redirectToProfile = redirectToProfile;
+    
 
     // 3) Gère le bouton de conversion (basculer EUR <-> USD)
     const toggleCurrencyButton = document.getElementById('toggleCurrencyButton');

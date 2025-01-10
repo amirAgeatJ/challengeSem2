@@ -1,7 +1,7 @@
 // src/budget.ts
 
 import { getBudget, saveBudget, Budget } from './common/db.js';
-import { displayUserProfile } from './userProfile.js';
+import { displayUserProfile, redirectToProfile } from './userProfile.js'; // Importation correcte avec .js
 
 // Supprimez ou commentez l'importation de Chart
 // import { Chart } from 'chart.js';
@@ -153,6 +153,9 @@ export async function initializeBudgetPage(): Promise<void> {
   await displayBudgetChart();
   await displayUserProfile();
   setupEventListeners();
+
+    (window as any).redirectToProfile = redirectToProfile;
+  
 }
 
 // Initialisation lors du chargement de la page

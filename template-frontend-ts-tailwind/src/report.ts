@@ -2,6 +2,7 @@
 
 import type { FileData } from './common/db.js'; // Import uniquement le type
 import { addFile, getFilesByUser, generateUUID, getUserById } from './common/db.js'; // Import des fonctions
+import {redirectToProfile } from './userProfile.js'; // Importation correcte avec .js
 import { notifyUser, sendPushNotification } from './common/notification.js'; // Import des fonctions de notification
 
 /**
@@ -181,13 +182,6 @@ async function displayUserProfile() {
 }
 
 /**
- * Redirige l'utilisateur vers la page de profil.
- */
-function redirectToProfile() {
-  window.location.href = 'profile.html'; // Remplacez par le chemin réel de votre page Profile
-}
-
-/**
  * Initialisation au chargement du DOM.
  */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -200,4 +194,6 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupFileHandlers();
   await updateFileList(userId);
   await displayUserProfile();
+    (window as any).redirectToProfile = redirectToProfile;
+  
 });
