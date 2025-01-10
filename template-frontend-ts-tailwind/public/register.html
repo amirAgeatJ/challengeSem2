@@ -7,8 +7,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
+<div class="w-full max-w-md p-8 bg-white shadow-lg rounded" style="border-radius: 20px;">
   <h2 class="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
+  <p style="text-align: center; margin-top: -20px; "> Vous avez déjà un compte ? <a href="login.html" style="color: #7662EA;"> Connectez-vous ici</a></p>
+  <br>
   <form id="registerForm">
     <div class="mb-4">
       <label for="username" class="block text-gray-700">Nom d'utilisateur</label>
@@ -27,15 +29,14 @@
       <input type="password" id="confirmPassword" class="w-full p-2 border border-gray-300 rounded">
     </div>
     <p id="passwordError" class="text-red-500 text-sm hidden">Les mots de passe ne correspondent pas.</p>
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">S'inscrire</button>
-
     <div class="mb-4 flex items-center">
       <input type="checkbox" id="termsCheckbox" class="mr-2">
       <label for="termsCheckbox" class="text-gray-700 text-sm">
         En cochant cette case, j'accepte les
-        <a href="#" class="text-blue-500">termes et conditions</a>.
+        <a href="#" style="color: #7662EA;">termes et conditions</a>.
       </label>
     </div>
+    <button type="submit" class="w-full text-white p-2 rounded" style="background-color:#7662EA ; margin-bottom: 20px;">S'inscrire</button>
   </form>
 </div>
 <script src="../dist/register.js"></script>

@@ -7,8 +7,10 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
-<div class="w-full max-w-md p-8 bg-white shadow-lg rounded">
+<div class="w-full max-w-md p-8 bg-white shadow-lg rounded" style="border-radius: 20px;">
   <h2 class="text-2xl font-bold mb-6 text-center">Connexion</h2>
+  <p style="text-align: center; margin-top: -20px;">Vous n'avez pas encore de compte ? <a href="register.html" style="color: #7662EA;">Inscrivez-vous ici</a></p>
+  <br>
   <form id="loginForm">
     <div class="mb-4">
       <label for="email" class="block text-gray-700">Email</label>
@@ -18,8 +20,9 @@
       <label for="password" class="block text-gray-700">Mot de passe</label>
       <input type="password" id="password" class="w-full p-2 border border-gray-300 rounded">
     </div>
-    <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded">Se connecter</button>
+    <button type="submit" class="w-full text-white p-2 rounded" style="background-color: #7662EA;">Se connecter</button>
   </form>
+  <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="continue_with" data-size="large" data-logo_alignment="left"></div>
 </div>
 <script src="../dist/login.js"></script>
 </body>
