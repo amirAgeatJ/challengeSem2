@@ -1,41 +1,16 @@
-// Initialise la base de données IndexedDB
-function initDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('FileDatabase', 3);
+// src/report.ts
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
+import type { FileData } from './common/db.js'; // Import uniquement le type
+import { addFile, getFilesByUser, generateUUID, getUserById } from './common/db.js'; // Import des fonctions
+import {redirectToProfile } from './common/userProfile.js'; // Importation correcte avec .js
+import { notifyUser, sendPushNotification } from './common/notification.js'; // Import des fonctions de notification
+import { initFullscreenButton } from './common/fullscreen.js'; // Import du module fullscreen
 
-      if (!db.objectStoreNames.contains('files')) {
-        const fileStore = db.createObjectStore('files', { keyPath: 'id', autoIncrement: true });
-        fileStore.createIndex('userId', 'userId', { unique: false }); // Index par userId
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-
-function initUserDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 7);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'id' });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Convertit un fichier en Base64
+/**
+ * Convertit un fichier en Base64.
+ * @param file Fichier à convertir.
+ * @returns Promise résolue avec la chaîne Base64.
+ */
 function fileToBase64(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -45,46 +20,23 @@ function fileToBase64(file: File): Promise<string> {
   });
 }
 
-// Ajoute un fichier dans IndexedDB
-async function addFile(file: File, userId: string): Promise<void> {
-  const fileData = {
-    id: crypto.randomUUID(),
-    userId,
-    name: file.name,
-    type: file.type,
-    content: await fileToBase64(file), // Conversion en Base64 AVANT d'ouvrir la transaction
-  };
-
-  const db = await initDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('files', 'readwrite');
-    const store = transaction.objectStore('files');
-
-    const request = store.add(fileData);
-
-    request.onsuccess = () => resolve();
-    request.onerror = (e) => reject(`Erreur lors de l'upload du fichier : ${e}`);
-  });
-}
-
-// Récupère les fichiers pour un utilisateur
-async function getFilesByUser(userId: string): Promise<{ id: string; name: string; content: string; type: string }[]> {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('files', 'readonly');
-    const store = transaction.objectStore('files');
-    const index = store.index('userId');
-    const request = index.getAll(userId);
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject('Erreur lors de la récupération des fichiers.');
-  });
-}
-
-// Télécharge un fichier
+/**
+ * Télécharge un fichier en créant un lien temporaire.
+ * @param name Nom du fichier.
+ * @param content Contenu du fichier en Base64.
+ * @param type Type MIME du fichier.
+ */
 function downloadFile(name: string, content: string, type: string) {
-  const blob = new Blob([content], { type });
+  // Convertir Base64 en Blob
+  const byteString = atob(content.split(',')[1]);
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  const blob = new Blob([ab], { type });
+
+  // Créer un lien et déclencher le téléchargement
   const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
   link.download = name;
@@ -92,36 +44,85 @@ function downloadFile(name: string, content: string, type: string) {
   URL.revokeObjectURL(link.href);
 }
 
-// Gestion de l'upload via l'input
-document.getElementById('uploadButton')?.addEventListener('click', async () => {
-  const fileInput = document.getElementById('fileInput') as HTMLInputElement;
-  const file = fileInput.files?.[0];
-
-  if (!file) {
-    alert('Veuillez sélectionner un fichier.');
-    return;
-  }
-
-  const userId = localStorage.getItem('idUser');
-  if (!userId) {
-    alert('Utilisateur non connecté.');
-    return;
-  }
+/**
+ * Met à jour la liste des fichiers affichés pour un utilisateur.
+ * @param userId ID de l'utilisateur.
+ */
+async function updateFileList(userId: string) {
+  const fileList = document.getElementById('fileList') as HTMLUListElement;
+  fileList.innerHTML = '';
 
   try {
-    await addFile(file, userId);
-    alert('Fichier uploadé avec succès !');
-    updateFileList(userId);
+    const files = await getFilesByUser(userId);
+    files.forEach((file) => {
+      const listItem = document.createElement('li');
+      listItem.textContent = file.name;
+
+      const downloadButton = document.createElement('button');
+      downloadButton.textContent = 'Télécharger';
+      downloadButton.className = 'ml-2 bg-green-500 text-white p-1 rounded';
+      downloadButton.addEventListener('click', () => downloadFile(file.name, file.content, file.type));
+
+      listItem.appendChild(downloadButton);
+      fileList.appendChild(listItem);
+    });
+  } catch (error) {
+    console.error(error);
+    alert('Erreur lors de la mise à jour de la liste des fichiers.');
+  }
+}
+
+/**
+ * Ajoute un fichier à la base de données et met à jour l'affichage.
+ * @param file Fichier à ajouter.
+ * @param userId ID de l'utilisateur.
+ */
+async function handleFileUpload(file: File, userId: string) {
+  try {
+    const fileData: FileData = {
+      id: generateUUID(),
+      userId,
+      name: file.name,
+      type: file.type,
+      content: await fileToBase64(file),
+    };
+
+    await addFile(fileData);
+    await notifyUser('Fichier uploadé avec succès !');
+    sendPushNotification('Upload Réussi', `Le fichier "${file.name}" a été uploadé avec succès.`);
+    await updateFileList(userId);
   } catch (error) {
     console.error(error);
     alert('Erreur lors de l\'upload du fichier.');
   }
-});
+}
 
-// Gestion du drag-and-drop
-function setupDragAndDrop() {
+/**
+ * Initialise les gestionnaires d'événements pour l'upload et le drag-and-drop.
+ */
+function setupFileHandlers() {
+  const uploadButton = document.getElementById('uploadButton') as HTMLButtonElement;
+  const fileInput = document.getElementById('fileInput') as HTMLInputElement;
   const dropZone = document.getElementById('dropZone') as HTMLDivElement;
 
+  // Gestionnaire pour le bouton d'upload
+  uploadButton.addEventListener('click', async () => {
+    const file = fileInput.files?.[0];
+    if (!file) {
+      alert('Veuillez sélectionner un fichier.');
+      return;
+    }
+
+    const userId = localStorage.getItem('idUser');
+    if (!userId) {
+      alert('Utilisateur non connecté.');
+      return;
+    }
+
+    await handleFileUpload(file, userId);
+  });
+
+  // Gestionnaires pour le drag-and-drop
   dropZone.addEventListener('dragover', (event) => {
     event.preventDefault();
     dropZone.classList.add('bg-gray-200');
@@ -148,32 +149,17 @@ function setupDragAndDrop() {
     }
 
     for (const file of files) {
-      try {
-        await addFile(file, userId);
-      } catch (error) {
-        console.error(error);
-        alert('Erreur lors de l\'upload du fichier.');
-      }
+      await handleFileUpload(file, userId);
     }
-    alert('Fichiers uploadés avec succès via Drag and Drop !');
-    updateFileList(userId);
+
+    alert('Fichiers uploadés avec succès via Drag and Drop !');
+    await updateFileList(userId);
   });
 }
 
-
-async function getUserById(userId: string): Promise<any | null> {
-  const db = await initUserDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('users', 'readonly');
-    const store = transaction.objectStore('users');
-    const request = store.get(userId);
-
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject("Erreur lors de la récupération de l'utilisateur.");
-  });
-}
-
-
+/**
+ * Affiche le profil utilisateur en mettant à jour l'image de profil.
+ */
 async function displayUserProfile() {
   const userId = localStorage.getItem("idUser");
   if (!userId) {
@@ -181,93 +167,36 @@ async function displayUserProfile() {
     return;
   }
 
-  const user = await getUserById(userId);
-  const userProfileImage = document.getElementById("userProfileImage") as HTMLImageElement;
-
-  if (user && user.profileImage) {
-    userProfileImage.src = user.profileImage;
-  } else {
-    userProfileImage.src = "assets/img/default-profile.png";
-  }
-}
-
-function redirectToProfile() {
-  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
-}
-
-
-
-// Deletes a file from IndexedDB
-async function deleteFile(fileId: string): Promise<void> {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('files', 'readwrite');
-    const store = transaction.objectStore('files');
-    const request = store.delete(fileId);
-
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject('Erreur lors de la suppression du fichier.');
-  });
-}
-
-async function updateFileList(userId: string) {
-  const fileList = document.getElementById('fileList') as HTMLUListElement;
-  fileList.innerHTML = '';
-
   try {
-    const files = await getFilesByUser(userId);
+    const user = await getUserById(userId);
+    const userProfileImage = document.getElementById("userProfileImage") as HTMLImageElement;
 
-    if (files.length === 0) {
-      const emptyState = document.createElement('li');
-      emptyState.textContent = 'Aucun fichier disponible.';
-      emptyState.className = 'text-gray-500 text-center';
-      fileList.appendChild(emptyState);
-      return;
+    if (user && user.profileImage) {
+      userProfileImage.src = user.profileImage;
+    } else {
+      userProfileImage.src = "assets/img/default-profile.png";
     }
-
-    files.forEach((file) => {
-      const listItem = document.createElement('li');
-      listItem.textContent = file.name;
-      listItem.className = 'flex justify-between items-center mb-2';
-
-      const buttonContainer = document.createElement('div');
-      buttonContainer.className = 'flex gap-4';
-
-      const downloadButton = document.createElement('button');
-      downloadButton.innerHTML = '<i class="bi bi-download"></i> Télécharger';
-      downloadButton.className = 'download-button';
-      downloadButton.addEventListener('click', () => downloadFile(file.name, file.content, file.type));
-
-      const deleteButton = document.createElement('button');
-      deleteButton.innerHTML = '<i class="bi bi-trash"></i> Supprimer';
-      deleteButton.className = 'delete-button';
-      deleteButton.addEventListener('click', async () => {
-        await deleteFile(file.id);
-        alert('Fichier supprimé avec succès.');
-        updateFileList(userId);
-      });
-
-      buttonContainer.appendChild(downloadButton);
-      buttonContainer.appendChild(deleteButton);
-
-      listItem.appendChild(buttonContainer);
-      fileList.appendChild(listItem);
-    });
   } catch (error) {
     console.error(error);
-    alert('Erreur lors de la mise à jour de la liste des fichiers.');
+    alert('Erreur lors de la récupération du profil utilisateur.');
   }
 }
 
-// Initialisation
-document.addEventListener('DOMContentLoaded', () => {
+/**
+ * Initialisation au chargement du DOM.
+ */
+document.addEventListener('DOMContentLoaded', async () => {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
     alert('Utilisateur non connecté.');
     return;
   }
 
-  setupDragAndDrop();
-  updateFileList(userId);
-  displayUserProfile();
+  setupFileHandlers();
+  await updateFileList(userId);
+  await displayUserProfile();
+  initFullscreenButton('fullscreenButton'); // Initialiser le bouton plein écran
+  
+    (window as any).redirectToProfile = redirectToProfile;
+  
 });

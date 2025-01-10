@@ -1,87 +1,18 @@
-// Initialise la base de données IndexedDB
-function initDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('TransactionDatabase', 4);
+// src/add-transaction.ts
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
+import { Transaction, addTransaction, updateBudgets } from './common/db.js'; // Import correct avec export de updateBudgets
+import { redirectToProfile } from './common/userProfile.js'; // Import depuis userProfile.ts
+import { initFullscreenButton } from './common/fullscreen.js'; // Import depuis fullscreen.ts
+import { notifyUser, sendPushNotification } from './common/notification.js'; // Import des fonctions de notification centralisées
 
-      if (!db.objectStoreNames.contains('transactions')) {
-        db.createObjectStore('transactions', { keyPath: 'id', autoIncrement: true });
-      }
-      if (!db.objectStoreNames.contains('budgets')) {
-        db.createObjectStore('budgets', { keyPath: 'userId' });
-      }
-    };
+const OPEN_CAGE_API_KEY = '57d7a23fd746459099536889ec38e85d'; // Remplacez par votre clé API réelle
 
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-function redirectToProfile() {
-  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
-}
-async function displayUserProfile() {
-  const userId = localStorage.getItem('idUser');
-  if (!userId) {
-    console.error('Utilisateur non connecté.');
-    return;
-  }
-
-  const user = await getUserById(userId);
-  const userProfileImage = document.getElementById('userProfileImage') as HTMLImageElement;
-
-  if (user && user.profileImage) {
-    userProfileImage.src = user.profileImage;
-  } else {
-    userProfileImage.src = 'assets/img/default-profile.png'; // Default image
-  }
-}
-async function getUserById(userId: string): Promise<any | null> {
-  const db = await initUserDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('users', 'readonly');
-    const store = transaction.objectStore('users');
-    const request = store.get(userId);
-
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject("Erreur lors de la récupération de l'utilisateur.");
-  });
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  displayUserProfile();
-});
-function initUserDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open('UserDatabase', 7);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (!db.objectStoreNames.contains('users')) {
-        db.createObjectStore('users', { keyPath: 'id' });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Interface pour une transaction
-interface Transaction {
-  id?: number;
-  userId: string;
-  type: string;
-  category: string;
-  amount: number;
-  location: string;
-  date: Date;
-}
-
-// Fonction pour obtenir l'adresse via OpenCageData API
-const OPEN_CAGE_API_KEY = '57d7a23fd746459099536889ec38e85d';
+/**
+ * Fonction pour obtenir l'adresse via OpenCageData API
+ * @param lat Latitude
+ * @param lon Longitude
+ * @returns Adresse formatée ou message d'erreur
+ */
 async function reverseGeocode(lat: number, lon: number): Promise<string> {
   try {
     const response = await fetch(
@@ -95,75 +26,9 @@ async function reverseGeocode(lat: number, lon: number): Promise<string> {
   }
 }
 
-// Récupère le budget pour un utilisateur donné
-async function getUserBudget(userId: string): Promise<any> {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction('budgets', 'readonly');
-    const store = transaction.objectStore('budgets');
-    const request = store.get(userId);
-
-    request.onsuccess = () =>
-      resolve(request.result || { userId, global: 0, transport: 0, leisure: 0, health: 0, housing: 0, education: 0 });
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Met à jour les budgets
-async function updateBudgets(userId: string, type: string, category: string, amount: number): Promise<void> {
-  const existingBudget = await getUserBudget(userId);
-  const updatedBudget = { ...existingBudget };
-  const adjustment = type === 'income' ? amount : -amount;
-
-  updatedBudget.global += adjustment;
-  updatedBudget[category] = (updatedBudget[category] || 0) + adjustment;
-
-  const db = await initDB();
-  const tx = db.transaction('budgets', 'readwrite');
-  const store = tx.objectStore('budgets');
-  store.put(updatedBudget);
-
-  return new Promise<void>((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = (e) => reject(e);
-  });
-}
-
-// Ajoute une transaction
-async function addTransaction(transaction: Transaction): Promise<void> {
-  const db = await initDB();
-  const tx = db.transaction('transactions', 'readwrite');
-  const store = tx.objectStore('transactions');
-  store.add(transaction);
-
-  return new Promise<void>((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = (e) => reject(e);
-  });
-}
-
-// Fonction pour afficher une notification et vibrer
-function showNotification(title: string, body: string) {
-  if (!("Notification" in window)) {
-    alert("Les notifications ne sont pas prises en charge par votre navigateur.");
-    return;
-  }
-
-  Notification.requestPermission().then((permission) => {
-    if (permission === "granted") {
-      new Notification(title, { body });
-
-      // Ajout de la vibration (durée personnalisée en millisecondes)
-      if (navigator.vibrate) {
-        navigator.vibrate([200, 100, 200]); // Vibre 200ms, pause 100ms, vibre 200ms
-      }
-    } else if (permission === "denied") {
-      alert("Vous avez refusé les notifications. Activez-les dans les paramètres du navigateur.");
-    }
-  });
-}
-
-// Gestion de la localisation
+/**
+ * Fonction de gestion de la localisation
+ */
 function getLocation(): void {
   if ('geolocation' in navigator) {
     navigator.geolocation.getCurrentPosition(async (position) => {
@@ -173,11 +38,16 @@ function getLocation(): void {
       const address = await reverseGeocode(lat, lon);
       const locationInput = document.getElementById('location') as HTMLInputElement;
       locationInput.value = address;
+    }, (error) => {
+      console.error('Erreur lors de la récupération de la localisation:', error);
+      alert("Impossible de récupérer la localisation.");
     });
   } else {
     alert("La géolocalisation n'est pas prise en charge par ce navigateur.");
   }
 }
+
+// Ajouter un gestionnaire d'événements pour le bouton de localisation
 document.getElementById('getLocation')?.addEventListener('click', getLocation);
 
 // Gestion du formulaire pour ajouter une transaction
@@ -202,7 +72,7 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
 
   const transaction: Transaction = {
     userId,
-    type,
+    type: type as 'income' | 'expense',
     category,
     amount,
     location,
@@ -211,8 +81,11 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
 
   try {
     await addTransaction(transaction);
-    await updateBudgets(userId, type, category, amount);
-    showNotification("Transaction ajoutée", `Votre transaction de ${amount} € a été ajoutée avec succès.`);
+    await updateBudgets(userId, type as 'income' | 'expense', category, amount);
+
+    // Utiliser les fonctions de notification centralisées
+    await notifyUser(`Votre transaction de ${amount} € a été ajoutée avec succès.`);
+    sendPushNotification("Transaction Ajoutée", `Votre transaction de ${amount} € a été ajoutée avec succès.`);
 
     // Ajout de vibration après une transaction réussie
     if (navigator.vibrate) {
@@ -220,9 +93,18 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
     }
 
     alert("Transaction ajoutée avec succès !");
-    window.location.href = "transaction.html";
+    window.location.href = "about.html";
   } catch (error) {
     console.error("Erreur lors de l'ajout de la transaction:", error);
     alert("Une erreur est survenue. Veuillez réessayer.");
   }
+});
+
+// Gestionnaire d'événements pour l'image de profil
+document.getElementById("userProfileImage")?.addEventListener("click", redirectToProfile);
+
+// Initialisation de l'application
+document.addEventListener('DOMContentLoaded', () => {
+  console.log("Formulaire prêt.");
+  initFullscreenButton('fullscreenButton'); // Initialiser le bouton plein écran
 });

@@ -1,136 +1,13 @@
-// Initialise IndexedDB pour TransactionDatabase
-function initTransactionDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("TransactionDatabase", 4);
+// src/transaction.ts
 
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (!db.objectStoreNames.contains("transactions")) {
-        db.createObjectStore("transactions", { keyPath: "id", autoIncrement: true });
-      }
-      if (!db.objectStoreNames.contains("budgets")) {
-        db.createObjectStore("budgets", { keyPath: "userId" });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Initialise IndexedDB pour UserDatabase
-function initUserDB(): Promise<IDBDatabase> {
-  return new Promise((resolve, reject) => {
-    const request = indexedDB.open("UserDatabase", 7);
-
-    request.onupgradeneeded = (event) => {
-      const db = (event.target as IDBOpenDBRequest).result;
-
-      if (!db.objectStoreNames.contains("users")) {
-        db.createObjectStore("users", { keyPath: "id" });
-      }
-    };
-
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
-}
-
-// Récupère les transactions pour un utilisateur
-async function getTransactionsForUser(userId: string): Promise<any[]> {
-  const db = await initTransactionDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("transactions", "readonly");
-    const store = transaction.objectStore("transactions");
-    const request = store.getAll();
-
-    request.onsuccess = () =>
-      resolve((request.result || []).filter((t: any) => t.userId === userId));
-    request.onerror = () => reject("Erreur lors de la récupération des transactions.");
-  });
-}
-
-// Récupère un utilisateur par ID
-async function getUserById(userId: string): Promise<any | null> {
-  const db = await initUserDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("users", "readonly");
-    const store = transaction.objectStore("users");
-    const request = store.get(userId);
-
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject("Erreur lors de la récupération de l’utilisateur.");
-  });
-}
-
-// Supprime une transaction par ID et met à jour le budget
-async function deleteTransaction(
-  transactionId: number,
-  userId: string,
-  type: string,
-  category: string,
-  amount: number
-): Promise<void> {
-  const db = await initTransactionDB();
-
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("transactions", "readwrite");
-    const store = transaction.objectStore("transactions");
-    const request = store.delete(transactionId);
-
-    request.onsuccess = async () => {
-      await updateBudgetAfterDeletion(userId, type, category, amount);
-      resolve();
-    };
-
-    request.onerror = () => reject("Erreur lors de la suppression de la transaction.");
-  });
-}
-
-// Récupère le budget pour un utilisateur
-async function getUserBudget(userId: string): Promise<any | null> {
-  const db = await initTransactionDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction("budgets", "readonly");
-    const store = transaction.objectStore("budgets");
-    const request = store.get(userId);
-
-    request.onsuccess = () => resolve(request.result || null);
-    request.onerror = () => reject("Erreur lors de la récupération du budget.");
-  });
-}
-
-// Met à jour le budget après suppression d'une transaction
-async function updateBudgetAfterDeletion(
-  userId: string,
-  type: string,
-  category: string,
-  amount: number
-): Promise<void> {
-  const db = await initTransactionDB();
-  const existingBudget = await getUserBudget(userId);
-
-  if (!existingBudget) {
-    console.error("Aucun budget trouvé pour l’utilisateur connecté.");
-    return;
-  }
-
-  const updatedBudget = { ...existingBudget };
-  const adjustment = type === "income" ? -amount : amount;
-
-  updatedBudget.global += adjustment;
-  updatedBudget[category] = (updatedBudget[category] || 0) + adjustment;
-
-  const tx = db.transaction("budgets", "readwrite");
-  const store = tx.objectStore("budgets");
-  store.put(updatedBudget);
-
-  return new Promise<void>((resolve, reject) => {
-    tx.oncomplete = () => resolve();
-    tx.onerror = (e) => reject(e);
-  });
-}
+import { 
+  getTransactionsForUser, 
+  deleteTransaction, 
+  Transaction 
+} from './common/db.js';
+import { getUserById } from './common/db.js';
+import { displayUserProfile, redirectToProfile } from './common/userProfile.js'; // Importation correcte avec .js
+import { initFullscreenButton } from './common/fullscreen.js'; // Import du module fullscreen
 
 // Retourne une icône pour une catégorie donnée
 function getCategoryIcon(category: string): string {
@@ -148,10 +25,10 @@ function getCategoryIcon(category: string): string {
 }
 
 // Affiche les transactions avec des icônes et un bouton Supprimer
-async function displayTransactions() {
+export async function displayTransactions(): Promise<void> {
   const userId = localStorage.getItem("idUser");
   if (!userId) {
-    console.error("Utilisateur non connecté.");
+    console.error("Erreur : Utilisateur non connecté.");
     return;
   }
 
@@ -167,52 +44,45 @@ async function displayTransactions() {
     if (!transactionList) return;
 
     if (transactions.length === 0) {
-      transactionList.innerHTML = `
-      <div class="empty-state">
-        <i class="bi bi-info-circle" style="font-size: 2rem; color: #7662EA;"></i>
-        <p>Votre historique est vide. Effectuez votre première transaction.</p>
-      </div>
-    `;
+      transactionList.innerHTML = `<p class="text-center text-gray-500">Aucune transaction trouvée.</p>`;
       return;
     }
 
     // Générer le HTML pour chaque transaction
     transactionList.innerHTML = transactions
-  .map((transaction) => {
-    const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
-    const categoryIcon = getCategoryIcon(transaction.category);
-    const userPhoto = user?.profileImage
-      ? `<img src="${user.profileImage}" alt="Profile" class="transaction-user-photo">`
-      : `<img src="assets/img/default-profile.png" alt="Profile" class="transaction-user-photo">`;
-    const username = user?.username || "Utilisateur";
+      .map((transaction) => {
+        const typeLabel = transaction.type === "income" ? "Revenu" : "Dépense";
+        const categoryIcon = getCategoryIcon(transaction.category);
+        const userPhoto = user?.profileImage
+          ? `<img src="${user.profileImage}" alt="Profile" class="transaction-user-photo">`
+          : `<img src="assets/img/default-profile.png" alt="Profile" class="transaction-user-photo">`;
+        const username = user?.username || "Utilisateur";
 
-    return `
-      <div class="transaction-item">
-        <div class="transaction-user-info">
-          ${userPhoto}
-          <span class="transaction-username">${username}</span>
-        </div>
-        <div class="transaction-details">
-          <p class="transaction-category" style="margin-right: 200px;">
-            <span class="category-icon">${categoryIcon}</span> ${transaction.category}
-          </p>
-          <p class="transaction-amount" style="margin-right: 200px;">${transaction.amount.toFixed(2)} €</p>
-          <p class="transaction-date" style="margin-right: 200px;">${new Date(transaction.date).toLocaleDateString()}</p>
-        </div>
-        <button
-          class="delete-button"
-          data-id="${transaction.id}"
-          data-type="${transaction.type}"
-          data-category="${transaction.category}"
-          data-amount="${transaction.amount}"
-          style="margin-right: 200px;"
-        >
-          Supprimer
-        </button>
-      </div>
-    `;
-  })
-  .join("");
+        return `
+          <div class="transaction-item">
+            <div class="transaction-user-info">
+              ${userPhoto}
+              <span class="transaction-username">${username}</span>
+            </div>
+            <div class="category-icon">${categoryIcon}</div>
+            <div class="transaction-details">
+              <p class="transaction-category">${transaction.category}</p>
+              <p class="transaction-amount">${transaction.amount.toFixed(2)} €</p>
+              <p class="transaction-date">${new Date(transaction.date).toLocaleDateString()}</p>
+            </div>
+            <button
+              class="delete-button"
+              data-id="${transaction.id}"
+              data-type="${transaction.type}"
+              data-category="${transaction.category}"
+              data-amount="${transaction.amount}"
+            >
+              Supprimer
+            </button>
+          </div>
+        `;
+      })
+      .join("");
 
     // Ajouter des écouteurs d'événements aux boutons Supprimer
     document.querySelectorAll(".delete-button").forEach((button) => {
@@ -239,6 +109,7 @@ async function displayTransactions() {
         }
       });
     });
+
   } catch (error) {
     console.error("Erreur lors de l'affichage des transactions :", error);
     const transactionList = document.getElementById("transactionList");
@@ -248,33 +119,15 @@ async function displayTransactions() {
   }
 }
 
-// Affiche l'image de profil de l'utilisateur connecté
-async function displayUserProfile() {
-  const userId = localStorage.getItem("idUser");
-  if (!userId) {
-    console.error("Utilisateur non connecté.");
-    return;
-  }
+// Fonction d'initialisation de la page Transaction
+export async function initializeTransactionPage(): Promise<void> {
+  await displayTransactions();
+  await displayUserProfile(); // Utilise la fonction importée
+  initFullscreenButton('fullscreenButton'); // Initialiser le bouton plein écran
 
-  const user = await getUserById(userId);
-  const userProfileImage = document.getElementById("userProfileImage") as HTMLImageElement;
-
-  if (user && user.profileImage) {
-    userProfileImage.src = user.profileImage;
-  } else {
-    userProfileImage.src = "assets/img/default-profile.png";
-  }
-}
-function redirectToProfile() {
-  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
+  // Exposer la fonction redirectToProfile au contexte global
+  (window as any).redirectToProfile = redirectToProfile;
 }
 
-// Initialisation
-document.addEventListener("DOMContentLoaded", async () => {
-  try {
-    await displayTransactions();
-    await displayUserProfile();
-  } catch (error) {
-    console.error("Erreur lors de l'affichage des données :", error);
-  }
-});
+// Initialisation lors du chargement de la page
+document.addEventListener('DOMContentLoaded', initializeTransactionPage);
