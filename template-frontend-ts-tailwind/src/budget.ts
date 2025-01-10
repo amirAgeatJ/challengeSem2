@@ -72,6 +72,9 @@ async function saveBudget(budgetData: {
   });
 }
 
+function redirectToProfile() {
+  window.location.href = 'profile.html'; // Remplacez 'profile.html' par le chemin réel de votre page Profile
+}
 // Récupère un budget depuis IndexedDB
 async function getBudget(): Promise<any | null> {
   const userId = localStorage.getItem('idUser');
