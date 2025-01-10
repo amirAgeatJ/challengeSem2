@@ -11,7 +11,7 @@ FundFlow est un site de gestion d'argent conçu pour aider les gens à mieux gé
 
 1. Cloner le projet :
    ```bash
-   git clone <lien-du-repo>
+   git clone https://github.com/amirAgeatJ/challengeSem2.git
    ```
 2. Accéder au dossier du projet :
    ```bash
@@ -49,3 +49,17 @@ Pour lancer le projet, vous devez ouvrir **deux terminaux** :
    ```
 
 Le projet devrait maintenant être accessible depuis votre navigateur à l'adresse spécifiée dans la console.
+
+## Web Api utilisé
+. IndexDB
+. LocalStorage
+. DOM
+. Battery status
+. Camera
+. File Upload
+. Drag and Drop
+. File Download
+. Fullscreen
+. Notification
+. IdleDetection
+. Clipboard
