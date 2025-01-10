@@ -63,3 +63,4 @@ Le projet devrait maintenant être accessible depuis votre navigateur à l'adres
 . Notification
 . IdleDetection
 . Clipboard
+. Vibration
