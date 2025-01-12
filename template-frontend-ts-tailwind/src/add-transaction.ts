@@ -1,8 +1,8 @@
 // src/add-transaction.ts
 
-import { Transaction, addTransaction, updateBudgets } from './common/db.js'; // Import correct avec export de updateBudgets
-import { redirectToProfile } from './common/userProfile.js'; // Import depuis userProfile.ts
-import { initFullscreenButton } from './common/fullscreen.js'; // Import depuis fullscreen.ts
+import { Transaction, addTransaction, updateBudgets } from './common/db.js'; // Importation de Transaction, addTransaction et updateBudgets depuis db.js
+import { redirectToProfile } from './common/userProfile.js'; // Importation depuis userProfile.js
+import { initFullscreenButton } from './common/fullscreen.js'; // Importation depuis fullscreen.js
 import { notifyUser, sendPushNotification } from './common/notification.js'; // Import des fonctions de notification centralisées
 
 const OPEN_CAGE_API_KEY = '57d7a23fd746459099536889ec38e85d'; // Remplacez par votre clé API réelle
@@ -34,7 +34,6 @@ function getLocation(): void {
     navigator.geolocation.getCurrentPosition(async (position) => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
-
       const address = await reverseGeocode(lat, lon);
       const locationInput = document.getElementById('location') as HTMLInputElement;
       locationInput.value = address;
@@ -54,12 +53,15 @@ document.getElementById('getLocation')?.addEventListener('click', getLocation);
 document.getElementById('transactionForm')?.addEventListener('submit', async (event) => {
   event.preventDefault();
 
+  // Récupération des valeurs des champs
   const type = (document.getElementById('transactionType') as HTMLSelectElement).value;
   const category = (document.getElementById('category') as HTMLSelectElement).value;
-  const amount = parseFloat((document.getElementById('amount') as HTMLInputElement).value);
-  const location = (document.getElementById('location') as HTMLInputElement).value;
+  const amountValue = (document.getElementById('amount') as HTMLInputElement).value;
+  const amount = parseFloat(amountValue);
+  const location = (document.getElementById('location') as HTMLInputElement).value.trim();
 
-  if (!type || !category || isNaN(amount) || amount <= 0) {
+  // Vérification que tous les champs sont remplis correctement
+  if (!type || !category || !amountValue || isNaN(amount) || amount <= 0 || !location) {
     alert("Veuillez remplir tous les champs correctement.");
     return;
   }
@@ -70,6 +72,7 @@ document.getElementById('transactionForm')?.addEventListener('submit', async (ev
     return;
   }
 
+  // Création de l'objet transaction
   const transaction: Transaction = {
     userId,
     type: type as 'income' | 'expense',

@@ -23,6 +23,44 @@ async function fetchUsdRate(): Promise<void> {
   }
 }
 
+// Fonction pour remplir les champs du carousel budget
+async function fillBudgetCarousel() {
+  const userId = localStorage.getItem('idUser');
+  if (!userId) {
+    console.error('Utilisateur non connecté.');
+    return;
+  }
+
+  try {
+    const budget = await getBudget(userId);
+    if (!budget) {
+      console.error("Aucun budget trouvé pour l'utilisateur connecté.");
+      return;
+    }
+
+    const factor = currentCurrency === 'USD' ? usdRate : 1;
+
+    // Récupération des éléments du carousel par leurs id
+    const transportInput = document.getElementById('transportBudget') as HTMLInputElement;
+    const leisureInput = document.getElementById('leisureBudget') as HTMLInputElement;
+    const healthInput = document.getElementById('healthBudget') as HTMLInputElement;
+    const housingInput = document.getElementById('housingBudget') as HTMLInputElement;
+    const educationInput = document.getElementById('educationBudget') as HTMLInputElement;
+    const alimentaireInput = document.getElementById('alimentaireBudget') as HTMLInputElement;
+
+    if (transportInput) transportInput.value = ((budget.transport || 0) * factor).toFixed(2);
+    if (leisureInput) leisureInput.value = ((budget.leisure || 0) * factor).toFixed(2);
+    if (healthInput) healthInput.value = ((budget.health || 0) * factor).toFixed(2);
+    if (housingInput) housingInput.value = ((budget.housing || 0) * factor).toFixed(2);
+    if (educationInput) educationInput.value = ((budget.education || 0) * factor).toFixed(2);
+    // Vérifier que la propriété "alimentaire" existe dans vos données.
+    if (alimentaireInput) alimentaireInput.value = ((budget.alimentaire || 0) * factor).toFixed(2);
+    
+  } catch (error) {
+    console.error('Erreur lors du remplissage du carousel de budget :', error);
+  }
+}
+
 // Fonctions d'affichage
 
 /**
@@ -60,6 +98,9 @@ async function displayUserBudget() {
   }
 }
 
+/**
+ * Affiche le budget total de l'utilisateur
+ */
 async function displayTotalBudget() {
   const userId = localStorage.getItem('idUser');
   if (!userId) {
@@ -73,7 +114,7 @@ async function displayTotalBudget() {
 
     if (!budget || !totalBudgetElement) {
       console.error("Aucun budget trouvé pour l'utilisateur connecté.");
-      totalBudgetElement.textContent = '0 €';
+      if (totalBudgetElement) totalBudgetElement.textContent = '0 €';
       return;
     }
 
@@ -124,7 +165,6 @@ async function displayTransactionSummary() {
     const totalIncomeElement = document.getElementById('totalIncome');
 
     if (totalExpensesElement && totalIncomeElement) {
-      // Détermine le facteur et le symbole
       const factor = currentCurrency === 'USD' ? usdRate : 1;
       const symbol = currentCurrency === 'USD' ? '$' : '€';
 
@@ -157,7 +197,7 @@ async function displayTransactions() {
       return;
     }
 
-    // Enrichit les transactions avec infos user
+    // Enrichit les transactions avec infos utilisateur
     const enhancedTransactions = await Promise.all(
       transactions.map(async (transaction) => {
         const user = await getUserById(transaction.userId);
@@ -169,29 +209,29 @@ async function displayTransactions() {
       })
     );
 
-    // Conversion
     const factor = currentCurrency === 'USD' ? usdRate : 1;
     const symbol = currentCurrency === 'USD' ? '$' : '€';
 
     transactionList.innerHTML = enhancedTransactions
-      .map(
-        (transaction) => {
-          const convertedAmount = (transaction.amount * factor).toFixed(2);
-          return `
-            <div class="p-4 border border-gray-300 rounded flex items-center gap-4">
-              <img src="${transaction.userPhoto}" alt="Photo utilisateur" class="w-10 h-10 rounded-full">
-              <div>
-                <p><strong>Utilisateur :</strong> ${transaction.username}</p>
-                <p><strong>Type :</strong> ${transaction.type}</p>
-                <p><strong>Catégorie :</strong> ${transaction.category}</p>
-                <p><strong>Montant :</strong> ${convertedAmount} ${symbol}</p>
-                <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
-              </div>
+      .map((transaction) => {
+        const convertedAmount = (transaction.amount * factor).toFixed(2);
+        return `
+          <div class="p-4 border border-gray-300 rounded flex items-center gap-4">
+            <img src="${transaction.userPhoto}" alt="Photo utilisateur" class="w-10 h-10 rounded-full">
+            <div>
+              <p><strong>Utilisateur :</strong> ${transaction.username}</p>
+              <p><strong>Type :</strong> ${transaction.type}</p>
+              <p><strong>Catégorie :</strong> ${transaction.category}</p>
+              <p><strong>Montant :</strong> ${convertedAmount} ${symbol}</p>
+              <p><strong>Date :</strong> ${new Date(transaction.date).toLocaleDateString()}</p>
             </div>
-          `;
-        }
-      )
+          </div>
+        `;
+      })
       .join('');
+
+      
+      
   } catch (error) {
     console.error('Erreur lors de l’affichage des transactions :', error);
     const transactionList = document.getElementById('transactionList');
@@ -211,7 +251,6 @@ function copyTotalBudgetToClipboard() {
 
   const totalBudgetText = totalBudgetElement.textContent || "0 €";
 
-  // Vérifie si la Web API Clipboard est disponible
   if (navigator.clipboard) {
     navigator.clipboard.writeText(totalBudgetText).then(
       () => {
@@ -239,8 +278,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     await displayTransactions();
     await displayTransactionSummary();
     await displayUserProfile(); // Affiche l'image du profil utilisateur
-      (window as any).redirectToProfile = redirectToProfile;
-    
+
+    // Remplit les champs du carousel de budget
+    await fillBudgetCarousel();
+
+    // Permet d'utiliser la fonction redirectToProfile dans le contexte global
+    (window as any).redirectToProfile = redirectToProfile;
 
     // 3) Gère le bouton de conversion (basculer EUR <-> USD)
     const toggleCurrencyButton = document.getElementById('toggleCurrencyButton');
@@ -254,11 +297,12 @@ document.addEventListener('DOMContentLoaded', async () => {
           toggleCurrencyButton.textContent = 'USD';
         }
 
-        // On réaffiche tout après changement de devise
+        // Réaffiche toutes les sections après changement de devise
         await displayTotalBudget();
         await displayUserBudget();
         await displayTransactions();
         await displayTransactionSummary();
+        await fillBudgetCarousel();
       });
     }
 

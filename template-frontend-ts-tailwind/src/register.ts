@@ -1,7 +1,6 @@
 // src/register.ts
 
 import { User, addUser, generateUUID } from './common/db.js'; // Importation de User, addUser et generateUUID depuis db.ts
-import { redirectToProfile } from './userProfile.js'; // Importation depuis userProfile.ts
 import { initFullscreenButton } from './common/fullscreen.js'; // Importation depuis fullscreen.ts
 
 // Fonction pour vérifier si les mots de passe correspondent
@@ -64,8 +63,6 @@ document.getElementById('registerForm')?.addEventListener('submit', async (event
   }
 });
 
-// Gestionnaire d'événements pour l'image de profil
-document.getElementById("userProfileImage")?.addEventListener("click", redirectToProfile);
 
 // Initialisation de l'application
 document.addEventListener('DOMContentLoaded', () => {

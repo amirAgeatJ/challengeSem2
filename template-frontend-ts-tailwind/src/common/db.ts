@@ -435,7 +435,7 @@ export async function getTransactionsForUser(userId: string): Promise<Transactio
  * @param {number} transactionId - L'ID de la transaction à supprimer.
  * @returns {Promise<void>} Une promesse qui résout lorsque la transaction est supprimée.
  */
-export async function deleteTransaction(transactionId: number): Promise<void> {
+export async function deleteTransaction(transactionId: number, userId: string, type: string, category: string, amount: number): Promise<void> {
   const db = await initDB();
   const store = getObjectStore(db, 'transactions', 'readwrite');
 
